@@ -25,7 +25,7 @@ SECRET_KEY = '-v8f0ps@9x^&11g*)pmg20!4m1eck!wm81n_qsfi7vbc@+$ml$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -75,8 +75,15 @@ WSGI_APPLICATION = 'puzzlepieces.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'puzzlepieces',
+        'USER': 'puzzler',
+        'PASSWORD': 'puzzling',
+        'HOST': 'localhost',
+        'PORT': '',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
 
