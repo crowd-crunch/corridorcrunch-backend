@@ -1,0 +1,66 @@
+<head>
+<style>
+#imagecontainer {
+	width: 80%;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	border: black solid 2px;
+}
+#imagecontainer img {
+	width: 100%;
+}
+</style>
+</head>
+
+{% include "collector/includes/nav.html" %}
+
+<h1>Solution (Confidence {{ solution.confidence }}%)</h1>
+
+<div id="imagecontainer"><img class="puzzlepiece" src="{{ solution.puzzlePiece.url }}" alt="picture" /></div>
+
+<div>
+	<p>Last Modified: {{ solution.last_modified }}</p>
+</div>
+
+<div>
+Center: {{ solution.center }}
+</div>
+
+<div>
+Edge 1
+<p>Filled in? {{ solution.wall1 | yesno }}</p>
+<p>Symbols: {{ solution.link1 }}</p>
+</div>
+
+<div>
+Edge 2
+<p>Filled in? {{ solution.wall2 | yesno }}</p>
+<p>Symbols: {{ solution.link2 }}</p>
+</div>
+
+<div>
+Edge 3
+<p>Filled in? {{ solution.wall3 | yesno }}</p>
+<p>Symbols: {{ solution.link3 }}</p>
+</div>
+
+<div>
+Edge 4
+<p>Filled in? {{ solution.wall4 | yesno }}</p>
+<p>Symbols: {{ solution.link4 }}</p>
+</div>
+
+<div>
+Edge 5
+<p>Filled in? {{ solution.wall5 | yesno }}</p>
+<p>Symbols: {{ solution.link5 }}</p>
+</div>
+
+<div>
+Edge 6
+<p>Filled in? {{ solution.wall6 | yesno }}</p>
+<p>Symbols: {{ solution.link6 }}</p>
+</div>
+
+{% include "collector/includes/imgresize.js" %}

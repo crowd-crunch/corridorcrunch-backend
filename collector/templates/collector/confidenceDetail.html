@@ -1,0 +1,12 @@
+{{ confidence.id }}
+{{ confidence.puzzlePiece.url }}
+{{ confidence.confidence }}
+
+<a href="{% url 'puzzlepieceView' confidence.puzzlePiece.id %}">Puzzle Piece</a>
+
+{% if confidence.confidence > 70 %}
+<form actio<form action="" method="post">
+{% csrf_token %}
+<input type="submit" name="rerun" value="Re-run Confidence Check">
+</form>
+{% endif %}

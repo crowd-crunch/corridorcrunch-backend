@@ -1,0 +1,13 @@
+{% include "collector/includes/nav.html" %}
+{% if latest %}
+<div>
+	<p>Latest submitted transcriptions...</p>
+	<ul>
+	{% for transcription in latest %}
+		<li>{{ transcription.submitted_date }} - <a href="{% url 'transcriptionsDetail' transcription.id %}">{{ transcription.id }} {{ transcription.puzzlePiece.id }} {{ transcription.puzzlePiece.url }}</a></li>
+	{% endfor %}
+	</ul>
+</div>
+{% else %}
+	<p>No images are available currently. Try submitting some!</p>
+{% endif %}

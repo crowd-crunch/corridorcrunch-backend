@@ -1,0 +1,59 @@
+<html>
+<head>
+<style>
+#imagecontainer {
+	width: 80%;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	border: black solid 2px;
+}
+#imagecontainer img {
+	width: 100%;
+}
+</style>
+</head>
+<body>
+<div>
+	{% include "collector/includes/nav.html" %}
+{% if puzzlepiece %}
+	<div id="imagecontainer"><img class="puzzlepiece" src="{{ puzzlepiece.url }}" alt="picture" /></div>
+
+	<div>
+		<ul>
+		{% for item in puzzlepiece.transcriptions.all %}
+			<li><a href="{% url 'transcriptionsDetail' item.id %}">{{ item.id }} - {{ item.submitted_date }} {% if item.bad_image %}(Bad Image){% endif %}</a></li>
+		{% endfor %}
+		</ul>
+	</div>
+	<div>
+		<ul>
+		{% for item in puzzlepiece.confidences.all %}
+			<li><a href="{% url 'confidenceDetail' item.id %}">Confidence Score {{ item.confidence }}%</a></li>
+		{% endfor %}
+		</ul>
+	</div>
+
+	<div>
+		<ul>
+		{% for item in puzzlepiece.confidentsolutions.all %}
+			<li><a href="{% url 'confidenceSolutionDetail' item.id %}">Confidence Score {{ item.confidence }}%</a></li>
+		{% endfor %}
+		</ul>
+	</div>
+
+
+	<div>{{ puzzlepiece | safe }}</div>
+
+	<form action="" method="post">
+	{% csrf_token %}
+	<input type="submit" value="Refresh Confidence">
+	</form>
+{% else %}
+	<p>Well, this is embarrassing. That puzzle piece could not be found!</p>
+{% endif %}
+</div>
+
+{% include "collector/includes/imgresize.js" %}
+</body>
+</html>

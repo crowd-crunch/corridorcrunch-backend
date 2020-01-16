@@ -1,0 +1,13 @@
+{% include "collector/includes/nav.html" %}
+
+{% if latest %}
+<div>
+	<ul>
+	{% for confidence in latest %}
+		<li><a href="{% url 'confidenceDetail' confidence.id %}">{{ confidence.id }}</a> - {{ confidence.puzzlePiece.id }} - {{ confidence.confidence }}</li>
+	{% endfor %}
+	</ul>
+</div>
+{% else %}
+	<p>No confidence values are available currently. Please check back later.</p>
+{% endif %}

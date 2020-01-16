@@ -1,0 +1,10 @@
+{% include "collector/includes/nav.html" %}
+{% if collection %}
+	<ul>
+	{% for cs in collection %}
+		<li>{{ cs.id }} - <a href="{% url 'puzzlepieceView' cs.puzzlePiece.id %}">Puzzle Piece #{{ cs.puzzlePiece.id }}</a> - Confidence: {{ cs.confidence }}% - <a href="{% url 'confidenceSolutionDetail' cs.id %}">SOLUTION</a></li>
+	{% endfor %}
+	</ul>
+{% else %}
+	no data currently?
+{% endif %}

@@ -1,0 +1,51 @@
+{% include "collector/includes/nav.html" %}
+
+<div id="imagecontainer"><img class="puzzlepiece" src="{{ puzzlepiece.url }}" alt="picture" /></div>
+
+<div>
+	<p>Submitted: {{ transcription.submitted_date }}</p>
+	<p>Bad Image? {{ transcription.bad_image | yesno }} </p>
+	<p>HASH "{{ transcription.datahash }}"</p>
+</div>
+
+{% if not transcription.bad_image %}
+<div>
+Center: {{ transcription.center }}
+</div>
+
+<div>
+Edge 1
+<p>Filled in? {{ transcription.wall1 | yesno }}</p>
+<p>Symbols: {{ transcription.link1 }}</p>
+</div>
+
+<div>
+Edge 2
+<p>Filled in? {{ transcription.wall2 | yesno }}</p>
+<p>Symbols: {{ transcription.link2 }}</p>
+</div>
+
+<div>
+Edge 3
+<p>Filled in? {{ transcription.wall3 | yesno }}</p>
+<p>Symbols: {{ transcription.link3 }}</p>
+</div>
+
+<div>
+Edge 4
+<p>Filled in? {{ transcription.wall4 | yesno }}</p>
+<p>Symbols: {{ transcription.link4 }}</p>
+</div>
+
+<div>
+Edge 5
+<p>Filled in? {{ transcription.wall5 | yesno }}</p>
+<p>Symbols: {{ transcription.link5 }}</p>
+</div>
+
+<div>
+Edge 6
+<p>Filled in? {{ transcription.wall6 | yesno }}</p>
+<p>Symbols: {{ transcription.link6 }}</p>
+</div>
+{% endif %}

@@ -1,0 +1,71 @@
+<html>
+<head>
+<style>
+	div.puzzlepiece {
+		width: 95%;
+		border: 3px solid black;
+	}
+	#imagecontainer {
+		width: 80%;
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+		border: black solid 2px;
+	}
+	#imagecontainer img {
+		width: 100%;
+	}
+	div.transcribeform {
+		width: 80%;
+		height: 200px;
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+		border: black solid 2px;
+	}
+	div.transcribeform #formleft {
+		width: 80%;
+		float: left;
+	}
+	div.transcribeform #formright {
+		float: right;
+		width: 20%;
+	}
+
+	div.transcribeform #datafield {
+		width: 80%;
+		height: 80%
+	}
+	div.transcribeform #submitbutton {
+
+	}
+</style>
+</head>
+
+<div>
+	{% include "collector/includes/nav.html" %}
+	<div class="puzzlepiece">
+{% if puzzlepiece %}
+		<div id="imagecontainer"><img class="puzzlepiece" src="{{ puzzlepiece.url }}" /></div>
+		<div>{{ puzzlepiece | safe }}</div>
+		<div class="transcribeform">
+			<form action="{% url 'transcribeResults' puzzlepiece.id %}" id="transcribeform" method="post">
+				{% csrf_token %}
+				<div id="formleft">
+				Raw JSON<br/>
+				<textarea id="datafield" name="data" form="transcribeform"></textarea>
+				</div>
+				<div id="formright">
+				<p><input id="badimage" type="checkbox" name="bad_image" /> Bad or hard to read?<p/>
+				<input id="submitbutton" type="submit" name="submit" value="Submit" />
+				</div>
+			</form>
+		</div>
+{% else %}
+		<strong>This is embarassing but we could not load a puzzle piece to transcribe! This has been logged. Please try again.</strong>
+{% endif %}
+	</div>
+</div>
+
+{% include "collector/includes/imgresize.js" %}
+</html>

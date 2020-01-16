@@ -1,0 +1,18 @@
+<html>
+<body>
+{% include "collector/includes/nav.html" %}
+<h1>Puzzle Piece Submission</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<div width="100%">
+	<div>
+	<form action="" method="post">
+	{% csrf_token %}
+	URL: <input name="url" type="url"><br />
+	<input type="submit" value="Submit!">
+	</form>
+	</div>
+</div>
+</body>
+</html>

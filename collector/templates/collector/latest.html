@@ -1,0 +1,13 @@
+{% include "collector/includes/nav.html" %}
+{% if latest %}
+<div>
+	<p>Latest submitted images...</p>
+	<ul>
+	{% for image in latest %}
+		<li>{{ image.submitted_date }} - <a href="{% url 'puzzlepieceView' image.id %}">{{ image.id }} {{ image.url }}</a></li>
+	{% endfor %}
+	</ul>
+</div>
+{% else %}
+	<p>No images are available currently. Try submitting some!</p>
+{% endif %}
