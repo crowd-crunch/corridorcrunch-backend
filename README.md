@@ -27,6 +27,8 @@ python manage.py runserver 8000
 - [ ] Needs a approval process for submitted images...
 - [ ] Needs a prettification badly...
 - [ ] The 19 lore puzzle pieces should be filtered out of the results
+- [ ] Dockerize app and figure out deployment
+- [ ] update this readme lmao
 
 # about
 > the following is a draft of the frontend content, added here to hopefully convey the idea of the project a bit better
