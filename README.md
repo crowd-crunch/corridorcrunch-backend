@@ -6,6 +6,53 @@
 [what? check the draft of the frontend to get a better idea what this is about](#about)
 
 # development
+## ez mode
+requriements:
+- direnv
+- docker
+- docker-compose
+
+if you're on linux you can use tooling to make your life easier[direnv](https://github.com/direnv/direnv)
+
+
+```bash
+# allow the directory to load the custom commands
+direnv allow
+```
+
+and then you can use the `pz` command to do different things
+
+```bash
+# build the current dev version
+pz build
+
+# start the dev stack
+pz up
+
+# stop the dev stack
+pz down
+
+# build and reload  the dev stack (also starts if not running yet)
+pz reload
+
+# view logs of running service
+pz logs
+
+# attach to logs and follow running service
+pz logsf
+```
+
+## manual setup
+### Docker
+```bash
+# Dev
+docker-compose -f build && docker-compose up -d
+
+# Prod
+docker-compose build && docker-compose up -d
+```
+
+### local python
 Python 3.7 or newer.
 
 Install Django. Anything 3.0.x.
@@ -20,6 +67,7 @@ python manage.py migrate
 # Run the web server
 python manage.py runserver 8000
 ```
+
 
 # TODO:
 - [ ] Needs to be moved to MariaDB/PostgresSQL vs sqlite since sqlite does table-locks for any changes/reads.
