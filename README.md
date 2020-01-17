@@ -18,6 +18,15 @@ python manage.py migrate
 python manage.py runserver 8000
 ```
 
+Docker
+```bash
+Dev
+docker-compose build && docker-compose up -d
+
+Prod
+docker-compose -f docker-compose-prod.yml build && docker-compose -f docker-compose-prod.yml up -d
+```
+
 # TODO:
 - [ ] Needs to be moved to MariaDB/PostgresSQL vs sqlite since sqlite does table-locks for any changes/reads.
 - [ ] Needs a bulk add for images...
