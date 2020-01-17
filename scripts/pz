@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+build() {
+    docker-compose -f ops/docker-compose.dev.yml build
+}
+reload() {
+    docker-compose -f ops/docker-compose.dev.yml build
+    docker-compose -f ops/docker-compose.dev.yml up -d
+}
+up() {
+    docker-compose -f ops/docker-compose.dev.yml up -d
+}
+down() {
+    docker-compose -f ops/docker-compose.dev.yml down
+}
+logs() {
+    docker-compose -f ops/docker-compose.dev.yml logs
+}
+logsf() {
+    docker-compose -f ops/docker-compose.dev.yml logs -f
+}
+$1

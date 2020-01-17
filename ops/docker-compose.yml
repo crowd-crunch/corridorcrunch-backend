@@ -1,0 +1,63 @@
+version: "3"
+services:
+  caddy-gen:
+    container_name: puzzlepieces_caddygen
+    # we're using an implementation of caddy that autogenerates configurations
+    # why caddy? it does tls automagically
+    # https://github.com/wemake-services/caddy-gen
+    image: wemakeservices/caddy-gen:latest
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro  # needs socket to read events
+      - caddy-gen_acme:/etc/caddy/acme  # to save acme
+      - caddy-gen_ocsp:/etc/caddy/ocsp  # to save certificates
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - web
+  web:
+    container_name: puzzlepieces_backend
+    image: puzzlepieces_backend
+    restart: always
+    build: ../
+    command: python manage.py runserver 0.0.0.0:8000
+    expose:
+     - 8000
+    env_file:
+      - production.env
+    depends_on:
+      - db
+    networks:
+      - frontend
+      - backend
+    labels:
+      - "virtual.host=${HOSTS}"  # your domains separated with a space
+      - "virtual.alias=${ALIAS}"  # alias for your domain (optional)
+      - "virtual.port=8000"  # exposed port of this container
+      - "virtual.tls-email=${TLS_EMAIL}"  # ssl is now on
+      - "virtual.websockets" # enable websocket passthrough
+      # - "virtual.auth.username=admin" # Optionally add http basic authentication
+      # - "virtual.auth.password=1234" # By specifying both username and password
+  db:
+    container_name: puzzlepieces_db
+    restart: always
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    env_file:
+      - db.env
+    volumes:
+      - /opt/puzzle-mysql:/var/lib/mysql
+    networks:
+      - backend
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
+
+    volumes:
+      caddy-gen_acme:
+      caddy-gen_ocsp:

@@ -1,10 +1,59 @@
 # puzzlepieces
+[JOIN THE DISCORD HERE, FRIEND](https://discord.gg/WF94QBc)
+
+
 
 [what? check the draft of the frontend to get a better idea what this is about](#about)
 
 # development
-Python 3.7 or newer. (Tested okay with 3.6)
-MariaDB, look at settings.py and make sure you have a DB ready and a user for it
+## ez mode
+requriements:
+- direnv
+- docker
+- docker-compose
+
+if you're on linux you can use tooling to make your life easier[direnv](https://github.com/direnv/direnv)
+
+
+```bash
+# allow the directory to load the custom commands
+direnv allow
+```
+
+and then you can use the `pz` command to do different things
+
+```bash
+# build the current dev version
+pz build
+
+# start the dev stack
+pz up
+
+# stop the dev stack
+pz down
+
+# build and reload  the dev stack (also starts if not running yet)
+pz reload
+
+# view logs of running service
+pz logs
+
+# attach to logs and follow running service
+pz logsf
+```
+
+## manual setup
+### Docker
+```bash
+# Dev
+docker-compose -f build && docker-compose up -d
+
+# Prod
+docker-compose build && docker-compose up -d
+```
+
+### local python
+Python 3.7 or newer.
 
 Install Django. Anything 3.0.x.
 ``` bash
@@ -20,11 +69,14 @@ python manage.py migrate
 python manage.py runserver 8000
 ```
 
+
 # TODO:
 - [ ] Needs a bulk add for images...
 - [ ] Needs a approval process for submitted images...
 - [ ] Needs a prettification badly...
 - [ ] The 19 lore puzzle pieces should be filtered out of the results
+- [ ] Dockerize app and figure out deployment
+- [ ] update this readme lmao
 
 # about
 > the following is a draft of the frontend content, added here to hopefully convey the idea of the project a bit better

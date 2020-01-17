@@ -22,13 +22,16 @@ TEMPLATE_DIRS = (
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '-v8f0ps@9x^&11g*)pmg20!4m1eck!wm81n_qsfi7vbc@+$ml$'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = int(os.environ.get("DEBUG", default=0))
 
-ALLOWED_HOSTS = ['*']
+#DJANGO_ALLOWED_HOSTS
+#ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -77,19 +80,18 @@ WSGI_APPLICATION = 'puzzlepieces.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'puzzlepieces',
-        'USER': 'puzzler',
-        'PASSWORD': 'puzzling',
-        'HOST': 'localhost',
-        'PORT': '',
-        'OPTIONS': {
+    "default": {
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.mysql"),
+        "NAME": os.environ.get("SQL_DATABASE", "puzzlepieces"),
+        "USER": os.environ.get("SQL_USER", "puzzler"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "puzzling"),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "5432"),
+        "OPTIONS": {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
