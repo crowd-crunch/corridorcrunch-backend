@@ -8,7 +8,7 @@ from .models import *
 import json
 #from django.db import transaction
 from . import UtilityOps as UtilityOps
-
+from urllib.parse import urlparse
 
 def hash_my_data(url):
 	import hashlib
@@ -20,7 +20,9 @@ def hash_my_data(url):
 
 def findUnconfidentPuzzlePieces():
 	import random
-	result = PuzzlePiece.objects.all()
+	#result = PuzzlePiece.objects.all()
+	result = PuzzlePiece.objects.raw('SELECT * FROM collector_puzzlepiece WHERE id NOT IN (SELECT puzzlePiece_id FROM collector_confidentsolution) ' + \
+					'AND id NOT IN (SELECT puzzlePiece_id FROM collector_badimage)')
 	# Want less than a certain confidence.
 	# X or more "bad image" records will disqualify from showing up again.
 	print(result.query)
@@ -41,6 +43,9 @@ def puzzlepieceSubmit(request):
 	try:
 		if request.method == "POST":
 			url = request.POST["url"]
+			host = urlparse(url).hostname
+			if host in ["tjl.co","gamerdvr.com","dropbox.com","www.gamerdvr.com","www.dropbox.com"]:
+				raise ValueError('We cannot accept images from gamerdvr or dropbox or tjl.co - try another host please, Discord works great!')
 
 			newPiece = PuzzlePiece()
 			newPiece.url = url
@@ -50,6 +55,8 @@ def puzzlepieceSubmit(request):
 			responseMessage = "Puzzle Piece image submitted successfully!"
 	except KeyError as ex:
 		responseMessage = "There was an issue with your request. Please try again?"
+	except ValueError as ex:
+		responseMessage = ex
 	except Exception as ex:
 		if "unique" in str(ex).lower():
 			responseMessage = "Looks like that puzzle piece image has already been submitted. Thanks for submitting!"
@@ -240,6 +247,8 @@ def determineConfidence(puzzlepieceId):
 	hashes = {}
 	confidenceRatio = 70
 	totalCount = len(data)
+	badCount = 0
+	badThreshold = 3
 
 	# Is there enough data to determine a confidence level?
 	# If no, create or update a tracker entry.
@@ -251,11 +260,14 @@ def determineConfidence(puzzlepieceId):
 		# Skip "bad image" flags.
 		if d.bad_image:
 			totalCount -= 1
+			badCount += 1
 			continue
 		if d.datahash not in hashes:
 			hashes[d.datahash] = 0
 		hashes[d.datahash] = hashes[d.datahash] + 1
-
+	if badCount >= badThreshold:
+		setOrUpdateBadImage(puzzlepieceId, badCount)
+		return
 	# solution threshold count is...
 	threshold = ((totalCount * confidenceRatio) / 100) - 5
 
@@ -278,6 +290,20 @@ def determineConfidence(puzzlepieceId):
 					setOrUpdateConfidenceSolution(puzzlepieceId, confidence, d.id)
 					break
 
+
+def setOrUpdateBadImage(puzzlepieceId, badCount):
+	try:
+		bad = BadImage.objects.get(puzzlePiece_id=puzzlepieceId)
+		bad = ConfidenceTracking.objects.filter(id=bad.id).update(badCount=badCount)
+		return bad
+	except Exception as ex:
+		bad = None
+
+	bad = BadImage()
+	bad.puzzlePiece = get_object_or_404(PuzzlePiece, pk=puzzlepieceId)
+	bad.badCount = badCount
+	bad.save()
+	return bad
 
 def setOrUpdateConfidenceTracking(puzzlepieceId, confidence):
 	try:

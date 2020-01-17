@@ -3,11 +3,13 @@
 [what? check the draft of the frontend to get a better idea what this is about](#about)
 
 # development
-Python 3.7 or newer.
+Python 3.7 or newer. (Tested okay with 3.6)
+MariaDB, look at settings.py and make sure you have a DB ready and a user for it
 
 Install Django. Anything 3.0.x.
 ``` bash
 pip install Django
+pip install mysqlclient
 # OR
 pip install -r requirements.txt
 
@@ -19,7 +21,6 @@ python manage.py runserver 8000
 ```
 
 # TODO:
-- [ ] Needs to be moved to MariaDB/PostgresSQL vs sqlite since sqlite does table-locks for any changes/reads.
 - [ ] Needs a bulk add for images...
 - [ ] Needs a approval process for submitted images...
 - [ ] Needs a prettification badly...
