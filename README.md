@@ -1,5 +1,8 @@
 # puzzlepieces
 [JOIN THE DISCORD HERE, FRIEND](https://discord.gg/WF94QBc)
+
+
+
 [what? check the draft of the frontend to get a better idea what this is about](#about)
 
 # development
