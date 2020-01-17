@@ -1,8 +1,7 @@
 #!/bin/sh
 
-echo "Waiting for the database to start..."
+echo "Waiting for 5 seconds.."
 sleep 5
-echo "Database started."
 
 python manage.py flush --no-input
 python manage.py migrate

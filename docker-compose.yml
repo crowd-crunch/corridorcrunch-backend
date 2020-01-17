@@ -18,7 +18,7 @@ services:
     #expose:
     #  - 8000
     env_file:
-      - environment.dev
+      - development.env
     depends_on:
       - db
     networks:
@@ -29,7 +29,7 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     env_file:
-      - environment-db.dev
+      - db-dev.env
     networks:
       - backend
 
