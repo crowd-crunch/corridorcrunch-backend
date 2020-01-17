@@ -9,9 +9,10 @@ import json
 #from django.db import transaction
 from . import UtilityOps as UtilityOps
 from urllib.parse import urlparse
+import hashlib
+import requests
 
 def hash_my_data(url):
-	import hashlib
 	url = url.encode("utf-8")
 	hash_object = hashlib.sha256(url)
 	hex_dig = hash_object.hexdigest()
@@ -25,9 +26,14 @@ def findUnconfidentPuzzlePieces():
 					'AND id NOT IN (SELECT puzzlePiece_id FROM collector_badimage)')
 	# Want less than a certain confidence.
 	# X or more "bad image" records will disqualify from showing up again.
-	print(result.query)
+	#print(result.query)
 	if len(result) > 0:
 		index = random.randint(0, len(result)-1)
+		# Add an isAmage that we'll reference in the template, this allows us to handle generic links
+		if result[index].url.endswith(".jpg") or result[index].url.endswith(".png"):
+			result[index].isImage = True
+		else:
+			result[index].isImage = False
 		return result[index]
 	return None
 
@@ -46,6 +52,9 @@ def puzzlepieceSubmit(request):
 			host = urlparse(url).hostname
 			if host in ["tjl.co","gamerdvr.com","dropbox.com","www.gamerdvr.com","www.dropbox.com"]:
 				raise ValueError('We cannot accept images from gamerdvr or dropbox or tjl.co - try another host please, Discord works great!')
+			res = requests.get(url)
+			if res.status_code != 200:
+				raise ValueError(url + ' -- That URL does not seem to exist. Please verify and try again.')
 
 			newPiece = PuzzlePiece()
 			newPiece.url = url
@@ -56,12 +65,12 @@ def puzzlepieceSubmit(request):
 	except KeyError as ex:
 		responseMessage = "There was an issue with your request. Please try again?"
 	except ValueError as ex:
-		responseMessage = ex
+		responseMessage = str(ex)
 	except Exception as ex:
-		if "unique" in str(ex).lower():
+		if "unique" in str(ex).lower() or "duplicate" in str(ex).lower():
 			responseMessage = "Looks like that puzzle piece image has already been submitted. Thanks for submitting!"
 		else:
-			responseMessage = "Something went wrong..."
+			responseMessage = "Something went wrong..." + str(ex)
 
 	template = loader.get_template("collector/submit_piece.html")
 	context = {
