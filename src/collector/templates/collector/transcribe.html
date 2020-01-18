@@ -40,6 +40,9 @@
 	div.transcribeform #submitbutton {
 
 	}
+	.red {
+		color: red;
+	}
 </style>
 </head>
 
@@ -56,12 +59,18 @@
 			<li>Copy and paste the RAW JSON output from tjl.co into the box below and click submit. The raw JSON is everything between the { and } curly brackets, including those brackets themselves.</li>
 			</ul>
 			<h4>Image Rotation:</h4>
-			All puzzle pieces should be transcribed as they appear when room's entrance is behind the player. You can easily verify the image rotation by using the outer pillars as landmarks. [See <a href="https://cdn.discordapp.com/attachments/667254133589540877/667353728365363200/Rotation_Landmarks.png">this rotation landmarks guide</a>]
+			{% if puzzlepiece.isRotated %}
+			<strong class="red">This image has previously been reported as being out of rotation. Please do transcribe it, and be extra careful about the way it faces!</strong><br />
+			{% endif %}
+			<ul>
+			<li>All puzzle pieces should be transcribed as they appear when room's entrance is behind the player. You can easily verify the image rotation by using the outer pillars as landmarks. [See <a href="https://cdn.discordapp.com/attachments/667254133589540877/667353728365363200/Rotation_Landmarks.png">this rotation landmarks guide</a>]</li>
+			<li>If an image is rotated incorrectly, and the correct rotation can be seen, please transcribe it and click <strong>"Warn others that this image is rotated"</strong> when submitting, and it will be flagged to others for additional attention.</li>
+			</ul>
 			<h4>Color Inversion:</h4>
 			All images are color-inverted to make them easier to read. You can click on the image to open the original version in a new tab.
 			Please don't report an image as bad because it looks inverted, we're doing that on purpose.<br>
 			<h4>Bad Images:</h4>
-			If an image is blurry, covered, cropped off, too small, doesn't load, or is unreadable for any reason, please click <strong>"Report Bad Image"</strong> and it will be removed from circulation. Images with rotations that can't be determined and images that do not show an in-game screenshot of a puzzle piece should also be reported. Please report all captures of the tjl.co site, as they are not original in-game puzzle pieces.</div><br>
+			If an image is blurry, covered, cropped off, too small, doesn't load, or is unreadable for any reason, please click <strong>"Report Bad Image"</strong> and it will be removed from circulation. Images with rotations that can't be determined should also be reported. Please report all captures of the tjl.co site, as they are not original in-game puzzle pieces.</div><br>
 		{% if puzzlepiece.isImage == 0 %}
 		<p>
 		<a target="_blank" rel="noopener noreferrer" href={{ puzzlepiece.url }}>Link to the page that should contain an image - we can only display raw images (.png and .jpg) inline.</a></div>
@@ -78,6 +87,7 @@
 				</div>
 				<div id="formright">
 				<p><input id="badimage" type="checkbox" name="bad_image" /> Report Bad Image<p/>
+				<p><input id="rotated" type="checkbox" name="rotated_image" /> Warn others that this image is rotated<p/>
 				<input id="submitbutton" type="submit" name="submit" value="Submit" />
 				</div>
 			</form>

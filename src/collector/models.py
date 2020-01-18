@@ -57,7 +57,15 @@ class TranscriptionData(models.Model):
 class BadImage(models.Model):
 	puzzlePiece = models.ForeignKey(PuzzlePiece, on_delete=models.CASCADE, related_name="badimages")
 	last_modified = models.DateTimeField(verbose_name="last modified date", auto_now=True)
-	badCount = models.PositiveIntegerField(verbose_name="how often this image was flagged as bad")
+	badCount = models.PositiveIntegerField(verbose_name="how often this image was reported as bad")
+
+	class Meta:
+		unique_together = ('id', 'puzzlePiece',)
+
+class RotatedImage(models.Model):
+	puzzlePiece = models.ForeignKey(PuzzlePiece, on_delete=models.CASCADE, related_name="rotatedimages")
+	last_modified = models.DateTimeField(verbose_name="last modified date", auto_now=True)
+	rotatedCount = models.PositiveIntegerField(verbose_name="how often this image was reported as incorrectly rotated")
 
 	class Meta:
 		unique_together = ('id', 'puzzlePiece',)

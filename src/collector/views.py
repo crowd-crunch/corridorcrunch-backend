@@ -34,6 +34,12 @@ def findUnconfidentPuzzlePieces():
 			result[index].isImage = True
 		else:
 			result[index].isImage = False
+		# Warn if rotateod
+		rotated = PuzzlePiece.objects.raw('SELECT id FROM collector_rotatedimage WHERE puzzlePiece_id = ' + str(result[index].id))
+		if rotated:
+			result[index].isRotated = True
+		else:
+			result[index].isRotated = False
 		return result[index]
 	return None
 
@@ -121,6 +127,10 @@ def processTranscription(request, puzzlepiece_id):
 			bad_image = request.POST["bad_image"]
 		else:
 			bad_image = False
+		if "rotated_image" in request.POST:
+			rotated_image = request.POST["rotated_image"]
+		else:
+			rotated_image = False
 		data = request.POST["data"]
 		try:
 			data = json.loads(data)
@@ -129,7 +139,7 @@ def processTranscription(request, puzzlepiece_id):
 
 		puzzlePiece = get_object_or_404(PuzzlePiece, pk=puzzlepiece_id)
 		client_ip_address = UtilityOps.UtilityOps.GetClientIP(request)
-		errors, transcriptData = processTransscriptionData(data, bad_image, puzzlePiece, client_ip_address)
+		errors, transcriptData = processTransscriptionData(data, bad_image, rotated_image, puzzlePiece, client_ip_address)
 		determineConfidence(puzzlepiece_id)
 
 	context = {
@@ -141,7 +151,7 @@ def processTranscription(request, puzzlepiece_id):
 
 
 
-def processTransscriptionData(rawData, bad_image, puzzlePiece, client_ip_address):
+def processTransscriptionData(rawData, bad_image, rotated_image, puzzlePiece, client_ip_address):
 	if bad_image and bool(bad_image) == True:
 		transcriptData = TranscriptionData()
 		transcriptData.ip_address = client_ip_address
@@ -162,6 +172,8 @@ def processTransscriptionData(rawData, bad_image, puzzlePiece, client_ip_address
 		transcriptData.link4 = ""
 		transcriptData.link5 = ""
 		transcriptData.link6 = ""
+		if rotated_image and bool(rotated_image) == True:
+			transcriptData.orientation = "wrong"
 
 		transcriptData.save()
 		return [], transcriptData
@@ -203,6 +215,8 @@ def processTransscriptionData(rawData, bad_image, puzzlePiece, client_ip_address
 		transcriptData.link4 = linkJoiner.join(edges[3])
 		transcriptData.link5 = linkJoiner.join(edges[4])
 		transcriptData.link6 = linkJoiner.join(edges[5])
+
+		if rotated_image and bool(rotated_image) == True:                                                                                                                                                                                                                           transcriptData.orientation = "wrong"
 
 		transcriptData.save()
 
@@ -258,6 +272,26 @@ def determineConfidence(puzzlepieceId):
 	totalCount = len(data)
 	badCount = 0
 	badThreshold = 3
+	rotationCount = 0
+
+	# Track bad images
+	for d in data:
+		if d.bad_image:
+			badCount += 1
+			continue
+
+	if badCount >= badThreshold:
+		setOrUpdateBadImage(puzzlepieceId, badCount)
+		return
+
+	# Track rotated images
+	for d in data:
+		if d.orientation == "wrong":
+			rotationCount += 1
+			continue
+
+	if rotationCount > 0:
+		setOrUpdateRotatedImage(puzzlepieceId, rotationCount)
 
 	# Is there enough data to determine a confidence level?
 	# If no, create or update a tracker entry.
@@ -269,14 +303,10 @@ def determineConfidence(puzzlepieceId):
 		# Skip "bad image" flags.
 		if d.bad_image:
 			totalCount -= 1
-			badCount += 1
 			continue
 		if d.datahash not in hashes:
 			hashes[d.datahash] = 0
 		hashes[d.datahash] = hashes[d.datahash] + 1
-	if badCount >= badThreshold:
-		setOrUpdateBadImage(puzzlepieceId, badCount)
-		return
 	# solution threshold count is...
 	threshold = ((totalCount * confidenceRatio) / 100) - 5
 
@@ -313,6 +343,20 @@ def setOrUpdateBadImage(puzzlepieceId, badCount):
 	bad.badCount = badCount
 	bad.save()
 	return bad
+
+def setOrUpdateRotatedImage(puzzlepieceId, rotationCount):
+	try:
+		rotated = RotatedImage.objects.get(puzzlePiece_id=puzzlepieceId)
+		rotated = ConfidenceTracking.objects.filter(id=rotated.id).update(rotatedCount=rotationCount)
+		return rotated
+	except Exception as ex:
+		rotated = None
+
+	rotated = RotatedImage()
+	rotated.puzzlePiece = get_object_or_404(PuzzlePiece, pk=puzzlepieceId)
+	rotated.rotatedCount = rotationCount
+	rotated.save()
+	return rotated
 
 def setOrUpdateConfidenceTracking(puzzlepieceId, confidence):
 	try:

@@ -65,7 +65,7 @@ pz up
 # stop the dev stack
 pz down
 # build and reload  the dev stack (also starts if not running yet)
-pz reload
+pz restart
 # view logs of running service
 pz logs
 # attach to logs and follow running service
