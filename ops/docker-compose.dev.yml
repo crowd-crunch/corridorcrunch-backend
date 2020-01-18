@@ -9,6 +9,8 @@ services:
       - "80:80"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
+    environment:
+      - DHPARAM_GENERATION=0
   web:
     container_name: puzzlepieces_backend
     image: puzzlepieces_backend

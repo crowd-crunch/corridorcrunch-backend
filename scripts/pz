@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+setupenv() {
+    cp ops/db-dev.env.example ops/db-dev.env
+    cp ops/development.env.example ops/development.env
+}
 build() {
     docker-compose -f ops/docker-compose.dev.yml build
 }

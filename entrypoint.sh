@@ -8,6 +8,8 @@ until mysql --host=$SQL_HOST --port=$SQL_PORT --user=$SQL_USER --password=$SQL_P
 done 
 >&2 echo "db is up PogChamp"
 
+echo "monkaS"
+
 python manage.py migrate &&
 
 exec "$@"

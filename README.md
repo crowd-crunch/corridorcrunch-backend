@@ -23,6 +23,9 @@ direnv allow
 and then you can use the `pz` command to do different things
 
 ```bash
+# setup dev environment files
+pz setupenv
+
 # build the current dev version
 pz build
 
