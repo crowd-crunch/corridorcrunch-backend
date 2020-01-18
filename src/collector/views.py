@@ -61,36 +61,43 @@ def index(request):
 
 def puzzlepieceSubmit(request):
 	responseMessage = None
+	responseMessageSuccess = None
 
 	try:
 		if request.method == "POST":
-			url = request.POST["url"]
+			url = request.POST["url"].strip()
 			host = urlparse(url).hostname
-			if host in ["tjl.co","gamerdvr.com","dropbox.com","www.gamerdvr.com","www.dropbox.com"]:
-				raise ValueError('We cannot accept images from gamerdvr or dropbox or tjl.co - try another host please, Discord works great!')
-			res = requests.get(url)
+			if host not in ["cdn.discordapp.com", "media.discordapp.net", "i.gyazo.com", "i.imgur.com"]:
+				raise ValueError('We only accept images from cdn.discordapp.com, media.discordapp.net, i.gyazo.com and i.imgur.com right now.')
+			if not (url.endswith(".jpg") or url.endswith(".png")):
+				raise ValueError('Please make sure your link ends with .jpg or .png. Direct links to images work best with our current site.')
+			if url.find("http",8,len(url)) != -1:
+				raise ValueError('Found http in the middle of the URL - did you paste it twice?' + url)
+			res = requests.head(url)
 			if res.status_code != 200:
 				raise ValueError(url + ' -- That URL does not seem to exist. Please verify and try again.')
 
 			newPiece = PuzzlePiece()
 			newPiece.url = url
 			newPiece.hash = hash_my_data(url)
-			newPiece.ip_address = UtilityOps.UtilityOps.GetClientIP(request)
+			# An IP is personal data as per GDPR, kid you not. Let's hash it, we just need something unique
+			newPiece.ip_address = hash_my_data(UtilityOps.UtilityOps.GetClientIP(request))
 			newPiece.save()
-			responseMessage = "Puzzle Piece image submitted successfully!"
+			responseMessageSuccess = "Puzzle Piece image submitted successfully!"
 	except KeyError as ex:
 		responseMessage = "There was an issue with your request. Please try again?"
 	except ValueError as ex:
 		responseMessage = str(ex)
 	except Exception as ex:
 		if "unique" in str(ex).lower() or "duplicate" in str(ex).lower():
-			responseMessage = "Looks like that puzzle piece image has already been submitted. Thanks for submitting!"
+			responseMessage = "We already had that. Try another!"
 		else:
 			responseMessage = "Something went wrong..." + str(ex)
 
 	template = loader.get_template("collector/submit_piece.html")
 	context = {
-		"error_message": responseMessage
+		"error_message": responseMessage,
+		"success_message": responseMessageSuccess,
 	}
 	return HttpResponse(template.render(context, request))
 
@@ -279,10 +286,14 @@ def determineConfidence(puzzlepieceId):
 
 	hashes = {}
 	confidenceRatio = 70
-	totalCount = len(data)
+	rotatedConfidenceRatio = 90
+	minSubmissions = 5
+	rotatedMinSubmissions = 8
 	badCount = 0
 	badThreshold = 3
 	rotationCount = 0
+	totalCount = len(data)
+	updateTransCount(puzzlepieceId,totalCount)
 
 	# Track bad images
 	for d in data:
@@ -305,7 +316,10 @@ def determineConfidence(puzzlepieceId):
 
 	# Is there enough data to determine a confidence level?
 	# If no, create or update a tracker entry.
-	if totalCount < 5:
+	if not rotationCount and totalCount < minSubmissions:
+		tracker = setOrUpdateConfidenceTracking(puzzlepieceId, totalCount)
+		return
+	elif rotationCount and totalCount < rotatedMinSubmissions:
 		tracker = setOrUpdateConfidenceTracking(puzzlepieceId, totalCount)
 		return
 
@@ -318,7 +332,11 @@ def determineConfidence(puzzlepieceId):
 			hashes[d.datahash] = 0
 		hashes[d.datahash] = hashes[d.datahash] + 1
 	# solution threshold count is...
-	threshold = ((totalCount * confidenceRatio) / 100) - 5
+	# This was -5, I think that's the minSubmissions? mkava knows for sure
+	if not rotationCount:
+		threshold = ((totalCount * confidenceRatio) / 100) - minSubmissions
+	else:
+		threshold = ((totalCount * rotatedConfidenceRatio) / 100) - rotatedMinSubmissions
 
 	biggest = 0
 	biggesthash = None
@@ -340,10 +358,18 @@ def determineConfidence(puzzlepieceId):
 					break
 
 
+def updateTransCount(puzzlepieceId, transCount):
+	try:
+		piece = PuzzlePiece.objects.get(id=puzzlepieceId)
+		piece = PuzzlePiece.objects.filter(id=piece.id).update(transCount=transCount)
+		return piece
+	except Exception as ex:
+		piece = None
+	
 def setOrUpdateBadImage(puzzlepieceId, badCount):
 	try:
 		bad = BadImage.objects.get(puzzlePiece_id=puzzlepieceId)
-		bad = ConfidenceTracking.objects.filter(id=bad.id).update(badCount=badCount)
+		bad = BadImage.objects.filter(id=bad.id).update(badCount=badCount)
 		return bad
 	except Exception as ex:
 		bad = None
@@ -357,7 +383,7 @@ def setOrUpdateBadImage(puzzlepieceId, badCount):
 def setOrUpdateRotatedImage(puzzlepieceId, rotationCount):
 	try:
 		rotated = RotatedImage.objects.get(puzzlePiece_id=puzzlepieceId)
-		rotated = ConfidenceTracking.objects.filter(id=rotated.id).update(rotatedCount=rotationCount)
+		rotated = RotatedImage.objects.filter(id=rotated.id).update(rotatedCount=rotationCount)
 		return rotated
 	except Exception as ex:
 		rotated = None
