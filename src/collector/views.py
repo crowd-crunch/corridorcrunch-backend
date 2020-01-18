@@ -28,22 +28,48 @@ def hash_my_data(url):
 	hex_dig = hash_object.hexdigest()
 	return hex_dig
 
+def findImage(url):
+	host = urlparse(url).hostname
+	if host in ["imgur.com"]:
+	# Can we be clever and figure out an Imgur URL on the fly?
+		turl = "https://i.imgur.com" + urlparse(url).path + ".png"
+		res = requests.head(turl)
+		if res.status_code == 200:
+			return turl
+		turl = "https://i.imgur.com" + urlparse(url).path + ".jpg"
+		res = requests.head(turl)
+		if res.status_code == 200:
+			return turl
+		return None
+	else:
+		return None
 
 def findUnconfidentPuzzlePieces(self):
 	import random
 	client_ip_hash = hash_my_data(UtilityOps.UtilityOps.GetClientIP(self.request))
+	# We want to order by transCount descending to get faster results. We do not show anything definitely flagged as bad; that already has been solved; or that this IP (hash) has offered a transcription for
 	result = PuzzlePiece.objects.raw('SELECT * FROM collector_puzzlepiece WHERE id NOT IN (SELECT puzzlePiece_id FROM collector_confidentsolution) ' + \
-					'AND id NOT IN (SELECT puzzlePiece_id FROM collector_badimage)')
+					'AND id NOT IN (SELECT puzzlePiece_id FROM collector_badimage) AND id not IN (SELECT puzzlePiece_id FROM collector_transcriptiondata WHERE ip_address = "' + \
+					client_ip_hash + '") ORDER BY transCount DESC')
 	# Want less than a certain confidence.
 	# X or more "bad image" records will disqualify from showing up again.
 	#print(result.query)
 	if len(result) > 0:
-		index = random.randint(0, len(result)-1)
+		#index = random.randint(0, len(result)-1)
+		#Randomly one of the top 20. This allows people to hit F5 if they don't like the one they see, instead of being forced to put in BS data or click "Bad Image"
+		index = random.randint(0, 19)
 		# Add an isImage that we'll reference in the template, this allows us to handle generic links
 		if result[index].url.endswith(".jpg") or result[index].url.endswith(".png"):
 			result[index].isImage = True
 		else:
-			result[index].isImage = False
+			# Can we be clever and figure out an Image URL on the fly?
+			turl = findImage(result[index].url)
+			if turl:
+				# Future - we could also update the DB with this
+				result[index].url = turl
+				result[index].isImage = True
+			else:
+				result[index].isImage = False
 		# Warn if rotateod
 		rotated = PuzzlePiece.objects.raw('SELECT id FROM collector_rotatedimage WHERE puzzlePiece_id = ' + str(result[index].id))
 		if rotated:
@@ -58,6 +84,9 @@ def index(request):
 	template = loader.get_template("collector/index.html")
 	return HttpResponse(template.render(None, request))
 
+def transcriptionGuide(request):
+	template = loader.get_template("collector/transcriptionGuide.html")
+	return HttpResponse(template.render(None, request))
 
 def puzzlepieceSubmit(request):
 	responseMessage = None

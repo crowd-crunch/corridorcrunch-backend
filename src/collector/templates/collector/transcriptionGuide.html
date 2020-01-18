@@ -1,0 +1,46 @@
+<html>
+<body>
+{% include "collector/includes/nav.html" %}
+<div style="width: 50%; margin: 0 auto;">
+<h1>Comprehensive Transcription Guide</h1>
+Whether you're new to transcribing puzzle pieces or not, please review this guide before proceeding to the transcription page.<br/>
+<h2><a href="https://tjl.co/corridors-of-time/" target="_blank">TJ09's Puzzle Piece Transcription Tool</a></h2>
+Open this webpage and have it handy. This tool greatly simplifies the transcription process with an easy to use graphical interface. It also converts the transcription from a graphical representation into code that can be used for verification. Take some time to familiarize yourself with the 6 different symbols. Now let's begin!<br/>
+
+<h2>1) Determine the image's orientation/rotation</h2>
+<b>This step is the most important, as it affects two different parts of the transcription.</b><br/>
+<br/>
+Before starting to input any information into the transcription tool, take a moment to look at the orientation of the image. One of the sides must be correctly identified as being the "top" side in order to complete an accurate transcription.<br />
+<br />
+The easiest way to determine the piece's orientation is to look for the single hexagonal pillar that is by itself away from the clusters of pillars toward the middle. <b>The single pillar is always to the left of the "top" side of the puzzle piece.</b> If the single pillar is not visible, you can also look for the two pillars that are grouped together on the far left of the puzzle piece, or check if the center image (if the piece has one) has been rotated. <a href="https://i.imgur.com/BdGmtR8.jpg" target="_blank">This image</a> shows what the symbols look like in the proper orientation.
+
+<a href="https://cdn.discordapp.com/attachments/667254133589540877/668100398556381194/Rotation_Landmarks.png" target="_blank">Here is a guide to illustrate useful landmarks.</a><br/>
+
+<h2>2) The center of the puzzle piece</h2>
+Not all puzzle pieces will have a symbol in the center, but if it does, enter that symbol first. Click on the middle of the large middle hexagon and select the symbol seen in the image being transcribed.<br/>
+
+<h2>3) The "walls" of the puzzle piece</h2>
+Around the edge of the puzzle piece's large middle hexagon is a "wall" that will have openings on one or more sides. Add the closed walls to the transcription tool by clicking on the edges that are not "open" in the image being transcribed.<br/>
+
+<h2>4) The "links" of the puzzle piece</h2>
+Around the center hexagon of the puzzle piece are six clusters comprised of seven hexagonal pillars. While some pillars within the seven-hexagon clusters might remain blank, many of the pillars will have symbols on them that need to be entered into the transcription tool in the same formation as the image being transcribed. Occasionally, some clusters will have all seven hexagons that are blank. This means the puzzle piece is an edge piece and you should just fill out the rest of the clusters that have symbols as usual.<br/>
+
+<h2>5) Copy the Raw JSON output</h2>
+After completing the above steps, the transcription is completed and the Raw JSON output is ready to be copied and pasted into our database submission form. The JSON data begins and ends with curly bracket { and }. The curly brackets must be included when submitting the Raw JSON to the database.<br/>
+
+<h2>Flagging Images</h2>
+Near the submission form, you have the option of flagging the image for quality control. Choosing "Flag Image Quality" tells the database that the image is poor quality and should be removed from circulation. You should flag image quality if an image is blurry, covered, cropped off, too small, doesn't load, or is unreadable for any reason.<br />
+<br />
+Choosing "Flag Image Rotation" tells the database that the image is readable, but is rotated to an unusual degree and requires additional scrutiny. If you receive an image that has flagged image rotation by another transcriber, you will see a notice that the image has flagged image rotation with a reminder to pay careful attention to the orientation of the sides of the puzzle piece. You should flag image rotation if an image's orientation might trick other transcribers into providing incorrect data.<br />
+<br />
+
+<h2>Questions?</h2>
+If you have any questions that weren't covered in this guide, <a href="https://discord.gg/WF94QBc" target="_blank">join our Discord server</a> and tag the @Developers with your question(s).<br />
+<br />
+Now grab a snack, sit back, and help the community solve this legendary puzzle!<br />
+<br />
+<div style="text-align: center;"><h2><a href="{% url 'transcribe' %}">Start Transcribing!</a></h2></div>
+
+</div>
+</body>
+</html>

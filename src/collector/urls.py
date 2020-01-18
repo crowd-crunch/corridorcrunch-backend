@@ -15,6 +15,7 @@ urlpatterns = [
 	path("puzzlepieces/<int:image_id>/", views.puzzlepieceView, name="puzzlepieceView"),
 	path("transcriptions", views.TranscriptionsIndex.as_view(), name="transcriptions"),
 	path("transcriptions/<int:transcription_id>", views.transcriptionsDetail, name="transcriptionsDetail"),
+	path("transcriptions/guide", views.transcriptionGuide, name="transcriptionGuide"),
 	path("transcribe", views.TranscribeIndex.as_view(), name="transcribe"),
 	path("transcribe/<int:puzzlepiece_id>", views.processTranscription, name="transcribeResults"),
 	path("confidence", views.ConfidenceIndex.as_view(), name="confidenceIndex"),
