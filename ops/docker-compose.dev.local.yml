@@ -1,0 +1,52 @@
+version: "3"
+services:
+    # we're using an implementation of nginx that autogenerates configurations
+    # https://github.com/jwilder/nginx-proxy
+  nginx-proxy:
+    container_name: puzzlepieces_proxy
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    environment:
+      - DHPARAM_GENERATION=0
+  web:
+    container_name: puzzlepieces_backend
+    image: puzzlepieces_backend
+    build: ../
+    command: python manage.py runserver 0.0.0.0:8000
+    expose:
+     - 8000
+    environment:
+      - VIRTUAL_HOST=localhost
+      - VIRTUAL_PORT=8000
+    env_file:
+      - development.env
+    depends_on:
+      - db
+    volumes:
+      - ../src:/usr/src/app
+    # networks:
+    #   - frontend
+    #   - backend
+  db:
+    container_name: puzzlepieces_db
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    env_file:
+      - db-dev.env
+    volumes:
+      - mysql_db:/var/lib/mysql
+    # networks:
+    #   - backend
+
+# networks:
+#   frontend:
+#     driver: bridge
+#   backend:
+#     driver: bridge
+
+volumes:
+  mysql_db:

@@ -8,48 +8,61 @@
 # development
 ## ez mode
 requriements:
-- direnv
+- [direnv](https://github.com/direnv/direnv)
 - docker
 - docker-compose
-
-if you're on linux you can use tooling to make your life easier[direnv](https://github.com/direnv/direnv)
 
 
 ```bash
 # allow the directory to load the custom commands
 direnv allow
 ```
-
-and then you can use the `pz` command to do different things
+and then you can use the `pz` command to run the commands on a built version of the current code:
 
 ```bash
 # setup dev environment files
 pz setupenv
+# build the current dev version
+pz lbuild
+# start the dev stack
+pz lup
+# stop the dev stack
+pz ldown
+# build and reload  the dev stack (also starts if not running yet)
+pz lreload
+# view logs of running service
+pz llogs
+# attach to logs and follow running service
+pz llogsf
+# execute a command inside a container
+pz lexec $docker_compose_service $commands
+## so if you wanna run a shell inside the db it would look like this
+pz lexec db bash
+# run an arbitrary docker-compose command on the dev cluster
+pz lcmd $command
+```
 
+if you do not want to mount the local `/src` directory into the running docker container, you can omit the prepended `l` on commands like so:
+
+```bash
+# setup dev environment files
+pz setupenv
 # build the current dev version
 pz build
-
 # start the dev stack
 pz up
-
 # stop the dev stack
 pz down
-
 # build and reload  the dev stack (also starts if not running yet)
 pz reload
-
 # view logs of running service
 pz logs
-
 # attach to logs and follow running service
 pz logsf
-
 # execute a command inside a container
 pz exec $docker_compose_service $commands
-
 ## so if you wanna run a shell inside the db it would look like this
 pz exec db bash
-
 # run an arbitrary docker-compose command on the dev cluster
 pz cmd $command
 ```

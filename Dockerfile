@@ -14,13 +14,13 @@ RUN apt-get update
 RUN apt-cache search mariadb
 RUN apt-get install -y libmariadb-dev mariadb-client gcc python3-dev musl-dev default-mysql-client
 
+# copy project
+COPY src/ /usr/src/app/
+
 # install dependencies
 RUN pip install --upgrade pip
-COPY ./requirements.txt /usr/src/app/requirements.txt
 RUN pip install -r requirements.txt
 
-# copy project
-COPY . /usr/src/app/
 
 #RUN addgroup -S app && adduser -S app -G app
 #USER app

@@ -32,6 +32,37 @@ exec() {
 cmd() {
     docker-compose -f ops/docker-compose.dev.yml $@
 }
+
+# LOCAL
+lbuild() {
+    docker-compose -f ops/docker-compose.dev.yml build
+}
+linplace() {
+    docker-compose -f ops/docker-compose.dev.local.yml build
+    docker-compose -f ops/docker-compose.dev.local.yml up -d
+}
+lup() {
+    docker-compose -f ops/docker-compose.dev.local.yml up -d
+}
+ldown() {
+    docker-compose -f ops/docker-compose.dev.local.yml down
+}
+lrestart() {
+    docker-compose -f ops/docker-compose.dev.local.yml down
+    docker-compose -f ops/docker-compose.dev.local.yml up -d
+}
+llogs() {
+    docker-compose -f ops/docker-compose.dev.local.yml logs
+}
+llogsf() {
+    docker-compose -f ops/docker-compose.dev.local.yml logs -f
+}
+lexec() {
+    docker-compose -f ops/docker-compose.dev.local.yml exec $@
+}
+lcmd() {
+    docker-compose -f ops/docker-compose.dev.local.yml $@
+}
 command=${1}
 shift
 ${command} $@
