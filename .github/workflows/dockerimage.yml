@@ -18,7 +18,7 @@ jobs:
       run: |
         TAG="docker.pkg.github.com/corridors-of-time-transcription/puzzlepieces/puzzlepieces:latest"
         docker login docker.pkg.github.com --username corridors-of-time-transcription --password ${{ secrets.GITHUB_TOKEN }}
-        docker build --tag ${TAG} --file Dockerfile
+        docker build . --file Dockerfile --tag ${TAG}
         docker push ${TAG}
     - name: Discord Message Notify
       uses: appleboy/discord-action@0.0.3
