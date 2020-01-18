@@ -15,6 +15,9 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+TEMPLATE_DIRS = (
+	BASE_DIR + 'templates',
+)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -78,12 +81,15 @@ WSGI_APPLICATION = 'puzzlepieces.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
-        "USER": os.environ.get("SQL_USER", "user"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.mysql"),
+        "NAME": os.environ.get("SQL_DATABASE", "puzzlepieces"),
+        "USER": os.environ.get("SQL_USER", "puzzler"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "puzzling"),
         "HOST": os.environ.get("SQL_HOST", "localhost"),
         "PORT": os.environ.get("SQL_PORT", "5432"),
+        "OPTIONS": {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
 

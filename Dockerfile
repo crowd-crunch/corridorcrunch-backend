@@ -12,7 +12,7 @@ ENV PYTHONUNBUFFERED 1
 # install psycopg2 dependencies
 RUN apt-get update
 RUN apt-cache search mariadb
-RUN apt-get install -y libmariadb-dev mariadb-client gcc python3-dev musl-dev
+RUN apt-get install -y libmariadb-dev mariadb-client gcc python3-dev musl-dev default-mysql-client
 
 # install dependencies
 RUN pip install --upgrade pip

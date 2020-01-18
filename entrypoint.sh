@@ -1,9 +1,13 @@
 #!/bin/sh
 
-echo "Waiting for 5 seconds.."
-sleep 5
+echo "Waiting for pepega database.."
+# set -e
+until mysql --host=$SQL_HOST --port=$SQL_PORT --user=$SQL_USER --password=$SQL_PASSWORD --execute='\q' $SQL_DATABASE; do
+    >&2 echo "still waiting for db ResidentSleeper.."
+    sleep 1
+done 
+>&2 echo "db is up PogChamp"
 
-python manage.py flush --no-input
-python manage.py migrate
+python manage.py migrate &&
 
 exec "$@"

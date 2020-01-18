@@ -1,6 +1,7 @@
 <div>
 	{
 	<a href="{% url 'index' %}" >Home</a> |
+	<a href="{% url 'puzzlepieceSubmit' %}">Submit New Puzzle Piece</a> |
 	<a href="{% url 'puzzlepieceIndex' %}">View All Pieces</a> |
 	<a href="{% url 'transcribe' %}">Transcribe Something</a> |
 	<a href="{% url 'confidenceIndex' %}">View All Confidence Ratings</a> |

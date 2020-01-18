@@ -8,10 +8,11 @@ from .models import *
 import json
 #from django.db import transaction
 from . import UtilityOps as UtilityOps
-
+from urllib.parse import urlparse
+import hashlib
+import requests
 
 def hash_my_data(url):
-	import hashlib
 	url = url.encode("utf-8")
 	hash_object = hashlib.sha256(url)
 	hex_dig = hash_object.hexdigest()
@@ -20,12 +21,19 @@ def hash_my_data(url):
 
 def findUnconfidentPuzzlePieces():
 	import random
-	result = PuzzlePiece.objects.all()
+	#result = PuzzlePiece.objects.all()
+	result = PuzzlePiece.objects.raw('SELECT * FROM collector_puzzlepiece WHERE id NOT IN (SELECT puzzlePiece_id FROM collector_confidentsolution) ' + \
+					'AND id NOT IN (SELECT puzzlePiece_id FROM collector_badimage)')
 	# Want less than a certain confidence.
 	# X or more "bad image" records will disqualify from showing up again.
-	print(result.query)
+	#print(result.query)
 	if len(result) > 0:
 		index = random.randint(0, len(result)-1)
+		# Add an isAmage that we'll reference in the template, this allows us to handle generic links
+		if result[index].url.endswith(".jpg") or result[index].url.endswith(".png"):
+			result[index].isImage = True
+		else:
+			result[index].isImage = False
 		return result[index]
 	return None
 
@@ -41,6 +49,12 @@ def puzzlepieceSubmit(request):
 	try:
 		if request.method == "POST":
 			url = request.POST["url"]
+			host = urlparse(url).hostname
+			if host in ["tjl.co","gamerdvr.com","dropbox.com","www.gamerdvr.com","www.dropbox.com"]:
+				raise ValueError('We cannot accept images from gamerdvr or dropbox or tjl.co - try another host please, Discord works great!')
+			res = requests.get(url)
+			if res.status_code != 200:
+				raise ValueError(url + ' -- That URL does not seem to exist. Please verify and try again.')
 
 			newPiece = PuzzlePiece()
 			newPiece.url = url
@@ -50,11 +64,13 @@ def puzzlepieceSubmit(request):
 			responseMessage = "Puzzle Piece image submitted successfully!"
 	except KeyError as ex:
 		responseMessage = "There was an issue with your request. Please try again?"
+	except ValueError as ex:
+		responseMessage = str(ex)
 	except Exception as ex:
-		if "unique" in str(ex).lower():
+		if "unique" in str(ex).lower() or "duplicate" in str(ex).lower():
 			responseMessage = "Looks like that puzzle piece image has already been submitted. Thanks for submitting!"
 		else:
-			responseMessage = "Something went wrong..."
+			responseMessage = "Something went wrong..." + str(ex)
 
 	template = loader.get_template("collector/submit_piece.html")
 	context = {
@@ -240,6 +256,8 @@ def determineConfidence(puzzlepieceId):
 	hashes = {}
 	confidenceRatio = 70
 	totalCount = len(data)
+	badCount = 0
+	badThreshold = 3
 
 	# Is there enough data to determine a confidence level?
 	# If no, create or update a tracker entry.
@@ -251,11 +269,14 @@ def determineConfidence(puzzlepieceId):
 		# Skip "bad image" flags.
 		if d.bad_image:
 			totalCount -= 1
+			badCount += 1
 			continue
 		if d.datahash not in hashes:
 			hashes[d.datahash] = 0
 		hashes[d.datahash] = hashes[d.datahash] + 1
-
+	if badCount >= badThreshold:
+		setOrUpdateBadImage(puzzlepieceId, badCount)
+		return
 	# solution threshold count is...
 	threshold = ((totalCount * confidenceRatio) / 100) - 5
 
@@ -278,6 +299,20 @@ def determineConfidence(puzzlepieceId):
 					setOrUpdateConfidenceSolution(puzzlepieceId, confidence, d.id)
 					break
 
+
+def setOrUpdateBadImage(puzzlepieceId, badCount):
+	try:
+		bad = BadImage.objects.get(puzzlePiece_id=puzzlepieceId)
+		bad = ConfidenceTracking.objects.filter(id=bad.id).update(badCount=badCount)
+		return bad
+	except Exception as ex:
+		bad = None
+
+	bad = BadImage()
+	bad.puzzlePiece = get_object_or_404(PuzzlePiece, pk=puzzlepieceId)
+	bad.badCount = badCount
+	bad.save()
+	return bad
 
 def setOrUpdateConfidenceTracking(puzzlepieceId, confidence):
 	try:

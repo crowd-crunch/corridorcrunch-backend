@@ -54,6 +54,14 @@ class TranscriptionData(models.Model):
 		return "{} {} {}".format(self.center, self.wall1, self.link1)
 
 
+class BadImage(models.Model):
+	puzzlePiece = models.ForeignKey(PuzzlePiece, on_delete=models.CASCADE, related_name="badimages")
+	last_modified = models.DateTimeField(verbose_name="last modified date", auto_now=True)
+	badCount = models.PositiveIntegerField(verbose_name="how often this image was flagged as bad")
+
+	class Meta:
+		unique_together = ('id', 'puzzlePiece',)
+
 class ConfidenceTracking(models.Model):
 	puzzlePiece = models.ForeignKey(PuzzlePiece, on_delete=models.CASCADE, related_name="confidences")
 	last_modified = models.DateTimeField(verbose_name="last modified date", auto_now=True)
