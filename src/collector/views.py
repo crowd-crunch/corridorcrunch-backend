@@ -59,7 +59,7 @@ def findUnconfidentPuzzlePieces(self):
 		#Randomly one of the top 20. This allows people to hit F5 if they don't like the one they see, instead of being forced to put in BS data or click "Bad Image"
 		index = random.randint(0, 19)
 		# Add an isImage that we'll reference in the template, this allows us to handle generic links
-		if result[index].url.endswith(".jpg") or result[index].url.endswith(".png"):
+		if result[index].url.lower().endswith(".jpg") or result[index].url.lower().endswith(".png"):
 			result[index].isImage = True
 		else:
 			# Can we be clever and figure out an Image URL on the fly?
@@ -98,7 +98,7 @@ def puzzlepieceSubmit(request):
 			host = urlparse(url).hostname
 			if host not in ["cdn.discordapp.com", "media.discordapp.net", "i.gyazo.com", "i.imgur.com"]:
 				raise ValueError('We only accept images from cdn.discordapp.com, media.discordapp.net, i.gyazo.com and i.imgur.com right now.')
-			if not (url.endswith(".jpg") or url.endswith(".png")):
+			if not (url.lower().endswith(".jpg") or url.lower().endswith(".png")):
 				raise ValueError('Please make sure your link ends with .jpg or .png. Direct links to images work best with our current site.')
 			if url.find("http",8,len(url)) != -1:
 				raise ValueError('Found http in the middle of the URL - did you paste it twice?' + url)
