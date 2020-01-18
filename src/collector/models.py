@@ -4,7 +4,7 @@ from django.db import models
 class PuzzlePiece(models.Model):
 	url = models.URLField(verbose_name="image url")
 	hash = models.CharField(max_length=64, unique=True, default="empty", verbose_name="sha256 hash of the url")
-	ip_address = models.CharField(max_length=64, default="?.?.?.?", verbose_name="submitter ip address")
+	ip_address = models.CharField(max_length=64, default="?.?.?.?", verbose_name="hash of submitter ip address")
 	submitted_date = models.DateTimeField(verbose_name="submitted date", auto_now_add=True)
 	last_modified = models.DateTimeField(verbose_name="last modified date", auto_now=True)
 	approved = models.NullBooleanField(verbose_name="is image approved for verification")
@@ -28,7 +28,7 @@ class PuzzlePiece(models.Model):
 
 class TranscriptionData(models.Model):
 	puzzlePiece = models.ForeignKey(PuzzlePiece, on_delete=models.CASCADE, related_name="transcriptions")
-	ip_address = models.CharField(max_length=40, default="?.?.?.?", verbose_name="submitter ip address")
+	ip_address = models.CharField(max_length=64, default="?.?.?.?", verbose_name="hash of submitter ip address")
 	submitted_date = models.DateTimeField(verbose_name="submitted date", auto_now=True)
 
 	bad_image = models.BooleanField(verbose_name="image is bad or hard to read")
