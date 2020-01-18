@@ -1,13 +1,6 @@
 from rest_framework import serializers
 from . import models
 
-
-class PuzzlePieceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.PuzzlePiece
-        fields = ['url', 'approved']
-
-
 class TranscriptionDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.TranscriptionData
@@ -16,6 +9,12 @@ class TranscriptionDataSerializer(serializers.ModelSerializer):
             'wall1', 'wall2', 'wall3', 'wall4', 'wall5', 'wall6',
             'link1', 'link2', 'link3', 'link4', 'link5', 'link6',
         ]
+
+
+class PuzzlePieceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.PuzzlePiece
+        fields = ['id', 'url', 'approved', 'confidences', 'confidentsolutions', 'badimages', 'rotatedimages', 'transCount']
 
 
 class BadImageSerializer(serializers.ModelSerializer):
