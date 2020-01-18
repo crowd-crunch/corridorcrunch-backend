@@ -1,18 +1,72 @@
 <html>
+<head>
+<style>
+        .red {
+                color: red;
+        }
+        .green {
+                color: green;
+        }
+</style>
+</head>
 <body>
 {% include "collector/includes/nav.html" %}
+<div style="width: 50%; margin: 0 auto;">
 <h1>Puzzle Piece Submission</h1>
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+<h4>Images wanted!</h4>
+The more images, the more things to transcribe, the more solutions. We need screenshots of the puzzle piece found when looking down in the final vault room when you run the "emblem sequence" in the Corridors of Time. <br />
+
+<h4>Submit Your Link</h4>
+<b>We currently only approve images that have been uploaded to Discord or gyazo or imgur.</b> <a href="https://discord.gg/Tue4PMf">Join the RaidSecrets Discord server</a> and post your image to the #corridors-of-time-images channel, then right click the image and copy the URL. Paste your URL in the box below and click submit. That's it!<br />
+<p>
+Please submit direct links to images, .jpg or .png. <strong>Links have to start with "https://" or "http://".</strong> We accept links to cdn.discordapp.com, media.discordapp.net, i.gyazo.com and i.imgur.com.<br />
+<br />
+
+{% if error_message %}<p><strong class=red>{{ error_message }}</strong></p>{% endif %}
+{% if success_message %}<p><strong class=green>{{ success_message }}</strong></p>{% endif %}
 
 <div width="100%">
-	<div>
-	<form action="" method="post">
-	{% csrf_token %}
-	URL: <input name="url" type="url"><br />
-	<input type="submit" value="Submit!">
-	</form>
-	</div>
+        <div>
+        <form action="" method="post">
+        {% csrf_token %}
+        URL: <input name="url" type="url"> &nbsp;||&nbsp;
+        <input type="submit" value="Submit!">
+        </form>
+        </div>
 </div>
+
+<h4>Bulk images</h4>
+If you have image URLs in <b>bulk</b>, please join <a href="https://discord.gg/WF94QBc">our Discord server</a> and let Eric know so we can import the whole batch at once.<br />
+
+<h4>Ideal image candidates:</h4>
+<ul>
+<li>Clear image</li>
+<li>Good contrast</li>
+<li>Image is not rotated</li>
+<li>No obscured symbols</li>
+<li>Outer pillars are visible</li></ul>
+
+<h4>Avoid submitting images that are:</h4>
+<ul>
+<li>Blurry </li>
+<li>Wildly rotated</li>
+<li>Low resolution</li>
+<li>Cropped or obscured</li>
+<li>Not an in-game screenshot</li>
+</ul>
+
+<h4>A Guide for Newcomers</h4>
+To enter the Corridors of Time, go to Osiris (pick up his new quest offering if you haven't yet) and launch the Sundial activity using the panel next to him. You will find yourself in an empty white space with a door ahead of you. Go through the corridor and you'll reach a room with 6 doors labeled with different symbols. <br />
+<br />
+To reach the vault room, you must follow a specific sequence of doors called the "emblem sequence," notated below. Upon arriving, you'll find a tomb surrounded by a transparent floor with a bunch of hexagonal pillars below. Interacting with the "???" action reveals the puzzle piece we need a screenshot of. <br />
+<br />
+With the entrance directly behind your back, approach the nearest edge of the transparent floor and look down into the pillars below. Please take special care to make sure all symbols are visible and not covered up by quests, weapons, or legs. You can repeat this process on other characters to obtain more puzzle pieces.<br />
+<br />
+<b>The Emblem Sequence:</b> [<a href="https://s3.amazonaws.com/assets.primagames.com/_resized/files/destiny-2-corridors-of-time-codes-emblem.png_1200x675_.png">Image</a>]<br />
+Diamond - Clover - Snake - Plus - Hex - Hex - Plus - Hex - Diamond - Clover - Snake
+
+</div>
+
 </body>
 </html>

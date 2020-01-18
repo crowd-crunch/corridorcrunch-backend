@@ -1,10 +1,12 @@
 <div>
 	{
-	<a href="{% url 'index' %}" >Home</a> |
-	<a href="{% url 'puzzlepieceIndex' %}">View All Pieces</a> |
-	<a href="{% url 'transcribe' %}">Transcribe Something</a> |
-	<a href="{% url 'confidenceIndex' %}">View All Confidence Ratings</a> |
-	<a href="{% url 'transcriptions' %}">View All Transcriptions</a>
+	<a href="{% url 'index' %}" >Home</a> &nbsp;||&nbsp;
+	<a href="{% url 'transcribe' %}">Transcribe Something</a> &nbsp;||&nbsp;
+	<a href="{% url 'puzzlepieceSubmit' %}">Submit New Puzzle Piece</a> &nbsp;||&nbsp; 
+	<a href="{% url 'puzzlepieceIndex' %}">View Newest Pieces</a> &nbsp;||&nbsp;
+	<a href="{% url 'confidenceIndex' %}">View All Confidence Ratings</a> &nbsp;||&nbsp;
+	<a href="{% url 'transcriptions' %}">View All Transcriptions</a> &nbsp;||&nbsp;
 	<a href="{% url 'confidenceSolutionIndex' %}">View All Found Solutions</a>
 	}
+<!--To make git happy--> 
 </div>
