@@ -108,7 +108,7 @@ venv.bak/
 dmypy.json
 # Pyre type checker
 .pyre/
-##### DJANGO 
+##### DJANGO
 # Created by https://www.gitignore.io
 ### OSX ###
 .DS_Store
@@ -183,3 +183,5 @@ db.sqlite3
 *.sql
 images.txt
 pzlog.txt
+settings_local.py
+.vscode

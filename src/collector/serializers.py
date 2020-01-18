@@ -5,7 +5,7 @@ from . import models
 class PuzzlePieceSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.PuzzlePiece
-        fields = ['url', 'approved']
+        fields = ['id', 'url', 'approved', 'confidences', 'confidentsolutions', 'transcriptions', 'badimages', 'rotatedimages']
 
 
 class TranscriptionDataSerializer(serializers.ModelSerializer):
