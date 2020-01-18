@@ -1,9 +1,11 @@
 # puzzlepieces
-[JOIN THE DISCORD HERE, FRIEND](https://discord.gg/WF94QBc)
 
-
-
-[what? check the draft of the frontend to get a better idea what this is about](#about)
+<p align="center">
+  <a href="https://discord.gg/WF94QBc">
+    <img src="https://discordapp.com/assets/bb408e0343ddedc0967f246f7e89cebf.svg" alt="join us on discord">
+  </a>
+</p>
+join us on discord!
 
 # development
 ## ez mode
