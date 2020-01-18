@@ -29,9 +29,9 @@ def hash_my_data(url):
 	return hex_dig
 
 
-def findUnconfidentPuzzlePieces():
+def findUnconfidentPuzzlePieces(self):
 	import random
-	#result = PuzzlePiece.objects.all()
+	client_ip_hash = hash_my_data(UtilityOps.UtilityOps.GetClientIP(self.request))
 	result = PuzzlePiece.objects.raw('SELECT * FROM collector_puzzlepiece WHERE id NOT IN (SELECT puzzlePiece_id FROM collector_confidentsolution) ' + \
 					'AND id NOT IN (SELECT puzzlePiece_id FROM collector_badimage)')
 	# Want less than a certain confidence.
@@ -39,7 +39,7 @@ def findUnconfidentPuzzlePieces():
 	#print(result.query)
 	if len(result) > 0:
 		index = random.randint(0, len(result)-1)
-		# Add an isAmage that we'll reference in the template, this allows us to handle generic links
+		# Add an isImage that we'll reference in the template, this allows us to handle generic links
 		if result[index].url.endswith(".jpg") or result[index].url.endswith(".png"):
 			result[index].isImage = True
 		else:
@@ -131,7 +131,7 @@ class TranscribeIndex(generic.ListView):
 	context_object_name = 'puzzlepiece'
 
 	def get_queryset(self):
-		return findUnconfidentPuzzlePieces()
+		return findUnconfidentPuzzlePieces(self)
 
 
 def processTranscription(request, puzzlepiece_id):
@@ -155,7 +155,8 @@ def processTranscription(request, puzzlepiece_id):
 			data = None
 
 		puzzlePiece = get_object_or_404(PuzzlePiece, pk=puzzlepiece_id)
-		client_ip_address = UtilityOps.UtilityOps.GetClientIP(request)
+		# Hash IP bcs of GDPR
+		client_ip_address = hash_my_data(UtilityOps.UtilityOps.GetClientIP(request))
 		errors, transcriptData = processTransscriptionData(data, bad_image, rotated_image, puzzlePiece, client_ip_address)
 		determineConfidence(puzzlepiece_id)
 
