@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='puzzlepiece',
             name='ip_address',
-            field=models.CharField(default='?.?.?.?', max_length=64, verbose_name='submitter ip address'),
+            field=models.CharField(default='?.?.?.?', max_length=64, verbose_name='hash of submitter ip address'),
         ),
     ]
