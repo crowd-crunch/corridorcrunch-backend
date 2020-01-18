@@ -61,36 +61,43 @@ def index(request):
 
 def puzzlepieceSubmit(request):
 	responseMessage = None
+	responseMessageSuccess = None
 
 	try:
 		if request.method == "POST":
-			url = request.POST["url"]
+			url = request.POST["url"].strip()
 			host = urlparse(url).hostname
-			if host in ["tjl.co","gamerdvr.com","dropbox.com","www.gamerdvr.com","www.dropbox.com"]:
-				raise ValueError('We cannot accept images from gamerdvr or dropbox or tjl.co - try another host please, Discord works great!')
-			res = requests.get(url)
+			if host not in ["cdn.discordapp.com", "media.discordapp.net", "i.gyazo.com", "i.imgur.com"]:
+				raise ValueError('We only accept images from cdn.discordapp.com, media.discordapp.net, i.gyazo.com and i.imgur.com right now.')
+			if not (url.endswith(".jpg") or url.endswith(".png")):
+				raise ValueError('Please make sure your link ends with .jpg or .png. Direct links to images work best with our current site.')
+			if url.find("http",8,len(url)) != -1:
+				raise ValueError('Found http in the middle of the URL - did you paste it twice?' + url)
+			res = requests.head(url)
 			if res.status_code != 200:
 				raise ValueError(url + ' -- That URL does not seem to exist. Please verify and try again.')
 
 			newPiece = PuzzlePiece()
 			newPiece.url = url
 			newPiece.hash = hash_my_data(url)
-			newPiece.ip_address = UtilityOps.UtilityOps.GetClientIP(request)
+			# An IP is personal data as per GDPR, kid you not. Let's hash it, we just need something unique
+			newPiece.ip_address = hash_my_data(UtilityOps.UtilityOps.GetClientIP(request))
 			newPiece.save()
-			responseMessage = "Puzzle Piece image submitted successfully!"
+			responseMessageSuccess = "Puzzle Piece image submitted successfully!"
 	except KeyError as ex:
 		responseMessage = "There was an issue with your request. Please try again?"
 	except ValueError as ex:
 		responseMessage = str(ex)
 	except Exception as ex:
 		if "unique" in str(ex).lower() or "duplicate" in str(ex).lower():
-			responseMessage = "Looks like that puzzle piece image has already been submitted. Thanks for submitting!"
+			responseMessage = "We already had that. Try another!"
 		else:
 			responseMessage = "Something went wrong..." + str(ex)
 
 	template = loader.get_template("collector/submit_piece.html")
 	context = {
-		"error_message": responseMessage
+		"error_message": responseMessage,
+		"success_message": responseMessageSuccess,
 	}
 	return HttpResponse(template.render(context, request))
 
