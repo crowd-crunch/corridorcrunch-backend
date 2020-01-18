@@ -1,0 +1,69 @@
+version: "3"
+services:
+  proxy:
+    image: "traefik:v2.1"
+    command:
+      # proxy
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myhttpchallenge.acme.httpchallenge=true"
+      - "--certificatesresolvers.myhttpchallenge.acme.httpchallenge.entrypoint=web"
+      # - "--certificatesresolvers.myhttpchallenge.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myhttpchallenge.acme.email=${TLS_EMAIL}"
+      - "--certificatesresolvers.myhttpchallenge.acme.storage=/letsencrypt/acme.json"
+      # API
+      - "--api.insecure=false"
+      - "--api.dashboard=false"
+      # - "traefik.http.routers.api.rule=Host(`traefik.${URL}`)"
+      # - "traefik.http.routers.api.service=api@internal"
+      # - "traefik.http.routers.api.middlewares=auth"
+      # - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_AUTHSTRING}"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "proxy_letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  backend:
+    image: docker.pkg.github.com/corridors-of-time-transcription/puzzlepieces/puzzlepieces:${IMAGE_TAG}
+    restart: always
+    command: python manage.py runserver 0.0.0.0:8000
+    expose:
+      - 8000
+    environment:
+      - DEBUG=${IS_DEBUG}
+      - SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_ALLOWED_HOSTS=${URL}
+      - SQL_ENGINE=django.db.backends.mysql
+      - SQL_DATABASE=puzzlepieces
+      - SQL_USER=${SQL_USER}
+      - SQL_PASSWORD=${SQL_PASSWORD}
+      - SQL_HOST=db
+      - SQL_PORT=${SQL_PORT}
+      - DATABASE=mysql
+    depends_on:
+      - db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`${URL}`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls.certresolver=myhttpchallenge"
+  db:
+    restart: always
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_PASSWORD=${SQL_PASSWORD_ROOT}
+      - MYSQL_DATABASE=puzzlepieces
+      - MYSQL_USER=${SQL_USER}
+      - MYSQL_PASSWORD=${SQL_PASSWORD}
+    volumes:
+      - db_mysql:/var/lib/mysql
+    labels:
+      - "traefik.enable=false"
+
+volumes:
+  proxy_letsencrypt:
+  db_mysql:

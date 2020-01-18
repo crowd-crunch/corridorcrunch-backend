@@ -179,3 +179,7 @@ __pycache__/
 local_settings.py
 .env
 db.sqlite3
+#Bulk import files and pzlog
+*.sql
+images.txt
+pzlog.txt

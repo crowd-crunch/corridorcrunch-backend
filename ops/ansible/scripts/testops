@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+configure() {
+    ansible-playbook ../configure.yml -i $1, -u root
+}
+
+deploy() {
+    ansible-playbook ../deploy.yml \
+        -i $1, \
+        -u root \
+        --extra-vars="${EXTRA_VARS}"
+
+}
+
+stop() {
+    ansible-playbook ../stop.yml \
+        -i $1, \
+        -u root \
+        --extra-vars="${EXTRA_VARS}"
+
+}
+
+restart() {
+    ansible-playbook ../restart.yml \
+        -i $1, \
+        -u root \
+        --extra-vars="${EXTRA_VARS}"
+
+}
+
+decomission() {
+    ansible-playbook ../decomission.yml \
+        -i $1, \
+        -u root \
+        --extra-vars="${EXTRA_VARS}"
+}
+
+command=${1}
+shift
+${command} $@
