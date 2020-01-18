@@ -26,7 +26,7 @@ def main():
 			if host in ["tjl.co","gamerdvr.com","dropbox.com","www.gamerdvr.com","www.dropbox.com"]:
 				raise ValueError('We cannot accept images from gamerdvr or dropbox or tjl.co - try another host please, Discord works great!')
 			# Check this can be reached
-			request = requests.get(line)
+			request = requests.head(line)
 			if request.status_code != 200:
 				raise ValueError('That URL does not seem to exist. Please verify and try again.')
 			i = PuzzlePiece()
