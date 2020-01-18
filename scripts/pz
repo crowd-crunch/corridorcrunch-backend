@@ -2,7 +2,7 @@
 build() {
     docker-compose -f ops/docker-compose.dev.yml build
 }
-reload() {
+inplace() {
     docker-compose -f ops/docker-compose.dev.yml build
     docker-compose -f ops/docker-compose.dev.yml up -d
 }
@@ -12,10 +12,22 @@ up() {
 down() {
     docker-compose -f ops/docker-compose.dev.yml down
 }
+restart() {
+    docker-compose -f ops/docker-compose.dev.yml down
+    docker-compose -f ops/docker-compose.dev.yml up -d
+}
 logs() {
     docker-compose -f ops/docker-compose.dev.yml logs
 }
 logsf() {
     docker-compose -f ops/docker-compose.dev.yml logs -f
 }
-$1
+exec() {
+    docker-compose -f ops/docker-compose.dev.yml exec $@
+}
+cmd() {
+    docker-compose -f ops/docker-compose.dev.yml $@
+}
+command=${1}
+shift
+${command} $@

@@ -40,6 +40,15 @@ pz logs
 
 # attach to logs and follow running service
 pz logsf
+
+# execute a command inside a container
+pz exec $docker_compose_service $commands
+
+## so if you wanna run a shell inside the db it would look like this
+pz exec db bash
+
+# run an arbitrary docker-compose command on the dev cluster
+pz cmd $command
 ```
 
 ## manual setup
