@@ -27,7 +27,7 @@ resource "aws_route53_record" "pz-dev-node-1-dns-main" {
   name    = "${var.dev_url_fqdn}"
   type    = "A"
   ttl     = "300"
-  records = ["${hcloud_server.pz-dev-node-1.ipv4}"]
+  records = ["${hcloud_server.pz-dev-node-1.ipv4_address}"]
 }
 
 resource "aws_route53_record" "pz-dev-node-1-dns-wildcard" {
