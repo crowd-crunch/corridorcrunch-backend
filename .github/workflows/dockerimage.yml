@@ -16,8 +16,8 @@ jobs:
     - uses: actions/checkout@v1
     - name: publish image
       run: |
-        TAG="docker.pkg.github.com/Corridors-of-Time-Transcription/puzzlepieces/puzzlepieces:latest"
-        docker login docker.pkg.github.com --username Corridors-of-Time-Transcription --password ${{ secrets.GITHUB_TOKEN }}
+        TAG="docker.pkg.github.com/corridors-of-time-transcription/puzzlepieces/puzzlepieces:latest"
+        docker login docker.pkg.github.com --username corridors-of-time-transcription --password ${{ secrets.GITHUB_TOKEN }}
         docker build --tag ${TAG} --file Dockerfile
         docker push ${TAG}
     - name: Discord Message Notify
