@@ -286,10 +286,14 @@ def determineConfidence(puzzlepieceId):
 
 	hashes = {}
 	confidenceRatio = 70
-	totalCount = len(data)
+	rotatedConfidenceRatio = 90
+	minSubmissions = 5
+	rotatedMinSubmissions = 8
 	badCount = 0
 	badThreshold = 3
 	rotationCount = 0
+	totalCount = len(data)
+	updateTransCount(puzzlepieceId,totalCount)
 
 	# Track bad images
 	for d in data:
@@ -312,7 +316,10 @@ def determineConfidence(puzzlepieceId):
 
 	# Is there enough data to determine a confidence level?
 	# If no, create or update a tracker entry.
-	if totalCount < 5:
+	if not rotationCount and totalCount < minSubmissions:
+		tracker = setOrUpdateConfidenceTracking(puzzlepieceId, totalCount)
+		return
+	elif rotationCount and totalCount < rotatedMinSubmissions:
 		tracker = setOrUpdateConfidenceTracking(puzzlepieceId, totalCount)
 		return
 
@@ -325,7 +332,11 @@ def determineConfidence(puzzlepieceId):
 			hashes[d.datahash] = 0
 		hashes[d.datahash] = hashes[d.datahash] + 1
 	# solution threshold count is...
-	threshold = ((totalCount * confidenceRatio) / 100) - 5
+	# This was -5, I think that's the minSubmissions? mkava knows for sure
+	if not rotationCount:
+		threshold = ((totalCount * confidenceRatio) / 100) - minSubmissions
+	else:
+		threshold = ((totalCount * rotatedConfidenceRatio) / 100) - rotatedMinSubmissions
 
 	biggest = 0
 	biggesthash = None
@@ -347,10 +358,18 @@ def determineConfidence(puzzlepieceId):
 					break
 
 
+def updateTransCount(puzzlepieceId, transCount):
+	try:
+		piece = PuzzlePiece.objects.get(id=puzzlepieceId)
+		piece = PuzzlePiece.objects.filter(id=piece.id).update(transCount=transCount)
+		return piece
+	except Exception as ex:
+		piece = None
+	
 def setOrUpdateBadImage(puzzlepieceId, badCount):
 	try:
 		bad = BadImage.objects.get(puzzlePiece_id=puzzlepieceId)
-		bad = ConfidenceTracking.objects.filter(id=bad.id).update(badCount=badCount)
+		bad = BadImage.objects.filter(id=bad.id).update(badCount=badCount)
 		return bad
 	except Exception as ex:
 		bad = None
@@ -364,7 +383,7 @@ def setOrUpdateBadImage(puzzlepieceId, badCount):
 def setOrUpdateRotatedImage(puzzlepieceId, rotationCount):
 	try:
 		rotated = RotatedImage.objects.get(puzzlePiece_id=puzzlepieceId)
-		rotated = ConfidenceTracking.objects.filter(id=rotated.id).update(rotatedCount=rotationCount)
+		rotated = RotatedImage.objects.filter(id=rotated.id).update(rotatedCount=rotationCount)
 		return rotated
 	except Exception as ex:
 		rotated = None

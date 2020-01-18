@@ -8,6 +8,7 @@ class PuzzlePiece(models.Model):
 	submitted_date = models.DateTimeField(verbose_name="submitted date", auto_now_add=True)
 	last_modified = models.DateTimeField(verbose_name="last modified date", auto_now=True)
 	approved = models.NullBooleanField(verbose_name="is image approved for verification")
+	transCount = models.PositiveIntegerField(default=0,verbose_name="Number of transcriptions received for this image")
 
 	def __str__(self):
 		data = []
@@ -16,6 +17,7 @@ class PuzzlePiece(models.Model):
 		data.append("submitted_date: {}".format(self.submitted_date))
 		data.append("last_modified: {}".format(self.last_modified))
 		data.append("hash: {}".format(self.hash))
+		data.append("transCount: {}".format(self.transCount))
 
 		result = ""
 		for d in data:
@@ -57,7 +59,7 @@ class TranscriptionData(models.Model):
 class BadImage(models.Model):
 	puzzlePiece = models.ForeignKey(PuzzlePiece, on_delete=models.CASCADE, related_name="badimages")
 	last_modified = models.DateTimeField(verbose_name="last modified date", auto_now=True)
-	badCount = models.PositiveIntegerField(verbose_name="how often this image was reported as bad")
+	badCount = models.PositiveIntegerField(default=0,verbose_name="how often this image was reported as bad")
 
 	class Meta:
 		unique_together = ('id', 'puzzlePiece',)
@@ -65,7 +67,7 @@ class BadImage(models.Model):
 class RotatedImage(models.Model):
 	puzzlePiece = models.ForeignKey(PuzzlePiece, on_delete=models.CASCADE, related_name="rotatedimages")
 	last_modified = models.DateTimeField(verbose_name="last modified date", auto_now=True)
-	rotatedCount = models.PositiveIntegerField(verbose_name="how often this image was reported as incorrectly rotated")
+	rotatedCount = models.PositiveIntegerField(default=0,verbose_name="how often this image was reported as incorrectly rotated")
 
 	class Meta:
 		unique_together = ('id', 'puzzlePiece',)
@@ -73,7 +75,7 @@ class RotatedImage(models.Model):
 class ConfidenceTracking(models.Model):
 	puzzlePiece = models.ForeignKey(PuzzlePiece, on_delete=models.CASCADE, related_name="confidences")
 	last_modified = models.DateTimeField(verbose_name="last modified date", auto_now=True)
-	confidence = models.PositiveIntegerField(verbose_name="how confident are we in this image, 0 to 100")
+	confidence = models.PositiveIntegerField(default=0,verbose_name="how confident are we in this image, 0 to 100")
 
 	class Meta:
 		unique_together = ('id', 'puzzlePiece',)
@@ -82,7 +84,7 @@ class ConfidenceTracking(models.Model):
 class ConfidentSolution(models.Model):
 	puzzlePiece = models.ForeignKey(PuzzlePiece, on_delete=models.CASCADE, related_name="confidentsolutions")
 	last_modified = models.DateTimeField(verbose_name="last modified date", auto_now=True)
-	confidence = models.PositiveIntegerField(verbose_name="how confident are we in this image, 0 to 100")
+	confidence = models.PositiveIntegerField(default=0,verbose_name="how confident are we in this image, 0 to 100")
 
 	center = models.CharField(max_length=20, verbose_name="center")
 
