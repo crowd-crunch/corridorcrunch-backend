@@ -1,0 +1,31 @@
+name: Docker Image CI
+
+on: 
+  push:
+    branches:
+      - master
+      
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: publish image
+      run: |
+        TAG="docker.pkg.github.com/Corridors-of-Time-Transcription/puzzlepieces/puzzlepieces:latest"
+        docker login docker.pkg.github.com --username Corridors-of-Time-Transcription --password ${{ secrets.GITHUB_TOKEN }}
+        docker build --tag ${TAG} --file Dockerfile
+        docker push ${TAG}
+    - name: Discord Message Notify
+      uses: appleboy/discord-action@0.0.3
+      with:
+        # discord webhook id
+        webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+        # discord webhook token
+        webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+        # the message contents (up to 2000 characters)
+        message: "PogChamp, new package published on registry: https://github.com/Corridors-of-Time-Transcription/puzzlepieces/packages"
