@@ -29,4 +29,4 @@ jobs:
         # discord webhook token
         webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
         # the message contents (up to 2000 characters)
-        message: "PogChamp, new package published on registry: https://github.com/Corridors-of-Time-Transcription/puzzlepieces/packages"
+        message: "PogChamp, new package version published on registry: https://github.com/Corridors-of-Time-Transcription/puzzlepieces/packages"

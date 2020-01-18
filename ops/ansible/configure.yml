@@ -1,0 +1,56 @@
+---
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Configure sshd 
+      copy:
+        src: "{{ playbook_dir }}/files/sshd_config"
+        dest: "/etc/ssh/sshd_config"
+        owner: root
+        group: root
+        backup: yes
+        validate: "/usr/sbin/sshd -T -f %s"
+      notify:
+        - restart sshd
+
+    - name: Install aptitude using apt
+      apt: 
+        name: aptitude
+        state: latest 
+        update_cache: yes 
+        force_apt_get: yes
+
+    - name: Install required system packages
+      apt: 
+        state: latest 
+        update_cache: yes
+        name: ['apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      apt: 
+          name: docker-ce 
+          state: latest 
+          update_cache: yes
+
+    - name: Install Python Prerequisites
+      pip:
+        state: latest
+        name: ['docker', 'docker-compose', 'PyYAML']
+        
+  handlers:
+      - name: restart sshd
+        service: 
+          name: sshd 
+          state: restarted
+        

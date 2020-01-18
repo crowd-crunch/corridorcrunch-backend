@@ -1,0 +1,45 @@
+---
+- hosts: all
+  become: true
+  environment:
+    URL: "{{ compose_env.URL }}"
+    TLS_EMAIL: "{{ compose_env.TLS_EMAIL }}"
+    IMAGE_TAG: "{{ compose_env.IMAGE_TAG }}"
+    IS_DEBUG: "{{ compose_env.IS_DEBUG }}"
+    DJANGO_SECRET_KEY: "{{ compose_env.DJANGO_SECRET_KEY }}"
+    SQL_USER: "{{ compose_env.SQL_USER }}"
+    SQL_PASSWORD: "{{ compose_env.SQL_PASSWORD }}"
+    SQL_PORT: "{{ compose_env.SQL_PORT }}"
+    SQL_PASSWORD_ROOT: "{{ compose_env.SQL_PASSWORD_ROOT }}"
+    TRAEFIK_AUTHSTRING: "{{ compose_env.TRAEFIK_AUTHSTRING }}"
+  
+  tasks:
+    - name: create application directory
+      file:
+        path: /puzzlepieces
+        state: directory
+        mode: "0755"
+
+    - name: place composefile
+      copy:
+        src: "{{ playbook_dir }}/files/docker-compose.yml"
+        dest: "/puzzlepieces/docker-compose.yml"
+        owner: root
+        group: root
+        backup: yes
+        validate: "docker-compose -f %s config "
+
+    - name: login to docker registry
+      shell: "docker login docker.pkg.github.com --username {{ gh.user }} --password {{ gh.pass }}"
+      notify:
+        - docker logout
+
+    - name: deploy services
+      docker_compose:
+        project_src: "/puzzlepieces"
+        state: present
+        pull: yes
+
+  handlers:
+    - name: docker logout
+      shell: docker logout
