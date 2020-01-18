@@ -1,9 +1,15 @@
-from django.urls import path
+from django.urls import include, path
+from rest_framework import routers
 
 from . import views
 
+api_router = routers.DefaultRouter()
+api_router.register(r'pieces', views.PuzzlePieceViewSet)
+api_router.register(r'transcriptions', views.TranscriptionDataViewSet)
+
 urlpatterns = [
 	path("", views.index, name="index"),
+        path('api/', include(api_router.urls)),
 	path("puzzlepieces/submit", views.puzzlepieceSubmit, name="puzzlepieceSubmit"),
 	path("puzzlepieces/", views.PuzzlepieceIndex.as_view(), name="puzzlepieceIndex"),
 	path("puzzlepieces/<int:image_id>/", views.puzzlepieceView, name="puzzlepieceView"),

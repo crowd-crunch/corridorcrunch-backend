@@ -5,12 +5,22 @@ from django.shortcuts import get_object_or_404, render
 from django.views import generic
 from django.db.models import Count
 from .models import *
+from .serializers import (
+    PuzzlePieceSerializer,
+    TranscriptionDataSerializer,
+    BadImageSerializer,
+    ConfidentSolutionSerializer,
+)
 import json
 #from django.db import transaction
 from . import UtilityOps as UtilityOps
 from urllib.parse import urlparse
+from random import randint
 import hashlib
 import requests
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import mixins, status, viewsets
 
 def hash_my_data(url):
 	url = url.encode("utf-8")
@@ -422,3 +432,47 @@ def confidenceSolutionDetail(request, solution_id):
 		"solution": solution,
 	}
 	return render(request, 'collector/confidenceSolutionDetail.html', context)
+
+
+class PuzzlePieceViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = PuzzlePiece.objects.all()
+    serializer_class = PuzzlePieceSerializer
+
+    @action(detail=False)
+    def get_random(self, request):
+        qs = PuzzlePiece.objects.annotate(
+            transcription_count=Count('transcriptions'),
+        ).filter(transcription_count__lt=5)
+        count = qs.aggregate(count=Count('pk'))['count']
+        print(count)
+        if count < 1:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        random_index = randint(0, count - 1)
+        rando = qs[random_index]
+        serializer = self.get_serializer(rando)
+        return Response(serializer.data)
+
+
+class TranscriptionDataViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
+    queryset = TranscriptionData.objects.all()
+    serializer_class = TranscriptionDataSerializer
+
+    # copied code from the mixin, but we need access to request here
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+
+        # TODO: ALSO MAKE HASH
+
+        # ip_address in kwargs here *should* put it in?
+        serializer.save(ip_address=ip)
+
+        headers = self.get_success_headers(serializer.data)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
