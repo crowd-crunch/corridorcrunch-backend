@@ -47,7 +47,7 @@ services:
     env_file:
       - db.env
     volumes:
-      - /opt/puzzle-mysql:/var/lib/mysql
+      - /opt/puzzle-mysql_db:/var/lib/mysql
     networks:
       - backend
 

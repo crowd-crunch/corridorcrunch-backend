@@ -35,6 +35,8 @@ services:
     restart: always
     env_file:
       - db-dev.env
+    volumes:
+      - mysql_db:/var/lib/mysql
     # networks:
     #   - backend
 
@@ -43,3 +45,6 @@ services:
 #     driver: bridge
 #   backend:
 #     driver: bridge
+
+volumes:
+  mysql_db:
