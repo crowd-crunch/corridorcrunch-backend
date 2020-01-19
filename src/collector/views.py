@@ -562,13 +562,19 @@ def exportVerifiedCSV(request):
 		"Link5",
 		"Link6",
 		"Confidence",
-		"Transcription count"
+		"Transcription count",
+		"Incorrect Rotation Flag"
 	])
 
 	for solution in ConfidentSolution.objects.all():
 		walls = [solution.wall1, solution.wall2, solution.wall3, solution.wall4, solution.wall5, solution.wall6]
 		openings = ",".join(str(i+1) for i in range(6) if walls[i])
 
+		rotated = PuzzlePiece.objects.raw('SELECT id FROM collector_rotatedimage WHERE puzzlePiece_id = ' + str(solution.puzzlePiece.id))
+		if rotated:
+			solution.rotated = True
+		else:
+			solution.rotated = False
 		writer.writerow([
 			solution.puzzlePiece.url,
 			solution.center,
@@ -580,7 +586,8 @@ def exportVerifiedCSV(request):
 			solution.link5,
 			solution.link6,
 			solution.confidence,
-			solution.puzzlePiece.transCount
+			solution.puzzlePiece.transCount,
+			solution.rotated
 		])
 
 	return response

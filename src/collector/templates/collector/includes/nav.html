@@ -8,5 +8,8 @@
 	<a href="{% url 'confidenceIndex' %}">View All Confidence Ratings</a> &nbsp;||&nbsp;
 	<a href="{% url 'transcriptions' %}">View All Transcriptions</a> &nbsp;||&nbsp;
 	<a href="{% url 'confidenceSolutionIndex' %}">View All Found Solutions</a>
+	}<br />
+	{
+        <a href="{% url 'exportVerifiedCSV' %}">CSV export of found solutions</a>
 	}
 </div>
