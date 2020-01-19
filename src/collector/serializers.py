@@ -13,6 +13,7 @@ class TranscriptionDataSerializer(serializers.ModelSerializer):
 
 class PuzzlePieceSerializer(serializers.ModelSerializer):
     badimages = serializers.SerializerMethodField(read_only=True)
+    isImage = serializers.SerializerMethodField('check_if_image')
 
     class Meta:
         model = models.PuzzlePiece
@@ -20,7 +21,7 @@ class PuzzlePieceSerializer(serializers.ModelSerializer):
             'id', 'url', 'approved',
             'confidences', 'confidentsolutions',
             'badimages', 'rotatedimages',
-            'transCount'
+            'transCount', 'isImage'
         ]
 
     def get_badimages(self, piece):
@@ -33,6 +34,16 @@ class PuzzlePieceSerializer(serializers.ModelSerializer):
             return piece.badimages.first().badCount
 
         return 0
+    
+    def check_if_image(self, instance):
+        normalised_url = instance.url.lower()
+        # Very naïve check for direct image links.
+        # If extending this, be _very_ careful about complexity, because
+        # this computation is done on GET request for each PuzzlePiece
+        # individually.
+        if normalised_url.endswith(".jpg") or normalised_url.endswith(".png") or normalised_url.endswith(".jpeg"):
+            return True
+        return False
 
 
 class BadImageSerializer(serializers.ModelSerializer):
