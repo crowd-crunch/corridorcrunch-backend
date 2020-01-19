@@ -6,6 +6,11 @@
 	<p>Submitted: {{ transcription.submitted_date }}</p>
 	<p>Bad Image? {{ transcription.bad_image | yesno }} </p>
 	<p>HASH "{{ transcription.datahash }}"</p>
+	{% if transcription.orientation == "wrong" %}
+	<p>Orientation is wrong.</p>
+	{% else %}
+	<p>Orientation is correct.</p>
+	{% endif %}
 </div>
 
 {% if not transcription.bad_image %}
