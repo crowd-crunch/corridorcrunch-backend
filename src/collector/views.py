@@ -3,6 +3,7 @@ from django.http import Http404
 from django.template import loader
 from django.shortcuts import get_object_or_404, render
 from django.views import generic
+from django.views.decorators.cache import cache_page
 from django.db.models import Count
 from django.conf import settings
 from .models import *
@@ -549,6 +550,7 @@ class TranscriptionDataViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+@cache_page(60 * 15)
 def exportVerifiedCSV(request):
 	response = HttpResponse(content_type = 'text/plain')
 	writer = csv.writer(response)
@@ -594,6 +596,7 @@ def exportVerifiedCSV(request):
 
 	return response
 
+@cache_page(60 * 15)
 def exportPiecesCSV(request):
 	response = HttpResponse(content_type = 'text/plain')
 	writer = csv.writer(response)
@@ -617,6 +620,7 @@ def exportPiecesCSV(request):
 
 	return response
 
+@cache_page(60 * 15)
 def exportTranscriptionsCSV(request):
 	response = HttpResponse(content_type = 'text/plain')
 	writer = csv.writer(response)
