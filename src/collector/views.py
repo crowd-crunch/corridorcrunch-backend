@@ -76,7 +76,8 @@ def findUnconfidentPuzzlePieces(self):
 		#Randomly one of the top N, imgPoolSize above
 		index = random.randint(0, min(len(result)-1, imgPoolSize-1))
 		# Add an isImage that we'll reference in the template, this allows us to handle generic links
-		if result[index].url.lower().endswith(".jpg") or result[index].url.lower().endswith(".png") or result[index].url.lower().endswith(".jpeg"):
+		parsedUrl = urlparse(result[index].url)
+		if parsedUrl.path.lower().endswith(".jpg") or parsedUrl.path.lower().endswith(".png") or parsedUrl.path.lower().endswith(".jpeg"):
 			result[index].isImage = True
 		else:
 			# Can we be clever and figure out an Image URL on the fly?
