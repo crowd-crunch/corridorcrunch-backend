@@ -182,8 +182,8 @@ def puzzlepieceSubmit(request):
 	return HttpResponse(template.render(context, request))
 
 
-@cache_page(60 * 15)
 class PuzzlepieceIndex(generic.ListView):
+	cache_timeout = 15 * 60
 	template_name = 'collector/latest.html'
 	context_object_name = 'latest'
 
@@ -354,8 +354,8 @@ def processTransscriptionData(rawData, bad_image, rotated_image, puzzlePiece, cl
 	return errors, transcriptData
 
 
-@cache_page(60 * 15)
 class TranscriptionsIndex(generic.ListView):
+	cache_timeout = 15 * 60
 	template_name = 'collector/transcriptions.html'
 	context_object_name = 'latest'
 
@@ -376,8 +376,8 @@ def transcriptionsDetail(request, transcription_id):
 	return render(request, 'collector/transcriptionDetail.html', context)
 
 
-@cache_page(60 * 15)
 class ConfidenceIndex(generic.ListView):
+	cache_timeout = 15 * 60
 	model = ConfidenceTracking
 	template_name = 'collector/confidenceIndex.html'
 	context_object_name = 'latest'
@@ -401,7 +401,7 @@ def determineConfidence(puzzlepieceId):
 	data = TranscriptionData.objects.filter(puzzlePiece_id=puzzlepieceId)
 
 	hashes = {}
-	confidenceRatio = 80 
+	confidenceRatio = 80
 	rotatedConfidenceRatio = 90
 	confidenceThreshold = 0 # We set this programmatically later
 	minSubmissions = 10
