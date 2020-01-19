@@ -57,7 +57,7 @@ def findUnconfidentPuzzlePieces(self):
 	if len(result) > 0:
 		#index = random.randint(0, len(result)-1)
 		#Randomly one of the top 20. This allows people to hit F5 if they don't like the one they see, instead of being forced to put in BS data or click "Bad Image"
-		index = random.randint(0, 19)
+		index = random.randint(0, min(len(result)-1, 19))
 		# Add an isImage that we'll reference in the template, this allows us to handle generic links
 		if result[index].url.lower().endswith(".jpg") or result[index].url.lower().endswith(".png"):
 			result[index].isImage = True
