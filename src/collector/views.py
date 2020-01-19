@@ -571,7 +571,7 @@ class TranscriptionDataViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin)
 
 @cache_page(60 * 15)
 def exportVerifiedCSV(request):
-	response = HttpResponse(content_type = 'text/plain')
+	response = HttpResponse(content_type = 'text/csv')
 	writer = csv.writer(response)
 
 	writer.writerow([
@@ -617,7 +617,7 @@ def exportVerifiedCSV(request):
 
 @cache_page(60 * 15)
 def exportPiecesCSV(request):
-	response = HttpResponse(content_type = 'text/plain')
+	response = HttpResponse(content_type = 'text/csv')
 	writer = csv.writer(response)
 
 	writer.writerow([
@@ -641,7 +641,7 @@ def exportPiecesCSV(request):
 
 @cache_page(60 * 15)
 def exportTranscriptionsCSV(request):
-	response = HttpResponse(content_type = 'text/plain')
+	response = HttpResponse(content_type = 'text/csv')
 	writer = csv.writer(response)
 
 	writer.writerow([
