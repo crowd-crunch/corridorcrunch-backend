@@ -103,14 +103,7 @@ def findUnconfidentPuzzlePieces(self):
 		if parsedUrl.path.lower().endswith(".jpg") or parsedUrl.path.lower().endswith(".png") or parsedUrl.path.lower().endswith(".jpeg"):
 			result[index].isImage = True
 		else:
-			# Can we be clever and figure out an Image URL on the fly?
-			turl = findImage(result[index].url)
-			if turl:
-				# Future - we could also update the DB with this
-				result[index].url = turl
-				result[index].isImage = True
-			else:
-				result[index].isImage = False
+			result[index].isImage = False
 		# Warn if rotateod
 		rotated = PuzzlePiece.objects.raw('SELECT id FROM collector_rotatedimage WHERE puzzlePiece_id = ' + str(result[index].id))
 		if rotated:
