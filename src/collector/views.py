@@ -61,18 +61,23 @@ def findImage(url):
 
 def findUnconfidentPuzzlePieces(self):
 	import random
+	imgPoolSize = 200
+
 	client_ip_hash = hash_my_data(UtilityOps.UtilityOps.GetClientIP(self.request))
 	# We want to order by transCount descending to get faster results. We do not show anything definitely flagged as bad; that already has been solved; or that this IP (hash) has offered a transcription for
+	#result = PuzzlePiece.objects.raw('SELECT * FROM collector_puzzlepiece WHERE id NOT IN (SELECT puzzlePiece_id FROM collector_confidentsolution) ' + \
+	#				'AND id NOT IN (SELECT puzzlePiece_id FROM collector_badimage) AND id not IN (SELECT puzzlePiece_id FROM collector_transcriptiondata WHERE ip_address = "' + \
+	#				client_ip_hash + '") ORDER BY transCount DESC')
 	result = PuzzlePiece.objects.raw('SELECT * FROM collector_puzzlepiece WHERE id NOT IN (SELECT puzzlePiece_id FROM collector_confidentsolution) ' + \
-					'AND id NOT IN (SELECT puzzlePiece_id FROM collector_badimage) AND id not IN (SELECT puzzlePiece_id FROM collector_transcriptiondata WHERE ip_address = "' + \
-					client_ip_hash + '") ORDER BY transCount DESC')
+					'AND id NOT IN (SELECT puzzlePiece_id FROM collector_badimage)' + \
+					' ORDER BY transCount DESC')
 	# Want less than a certain confidence.
 	# X or more "bad image" records will disqualify from showing up again.
 	#print(result.query)
 	if len(result) > 0:
 		#index = random.randint(0, len(result)-1)
-		#Randomly one of the top 20. This allows people to hit F5 if they don't like the one they see, instead of being forced to put in BS data or click "Bad Image"
-		index = random.randint(0, min(len(result)-1, 19))
+		#Randomly one of the top N, imgPoolSize above 
+		index = random.randint(0, min(len(result)-1, imgPoolSize-1))
 		# Add an isImage that we'll reference in the template, this allows us to handle generic links
 		if result[index].url.lower().endswith(".jpg") or result[index].url.lower().endswith(".png") or result[index].url.lower().endswith(".jpeg"):
 			result[index].isImage = True
@@ -263,8 +268,6 @@ def processTransscriptionData(rawData, bad_image, rotated_image, puzzlePiece, cl
 		transcriptData.puzzlePiece = puzzlePiece
 		transcriptData.center = center
 
-		transcriptData.datahash = hash_my_data(str(rawData))
-
 		transcriptData.wall1 = walls[0]
 		transcriptData.wall2 = walls[1]
 		transcriptData.wall3 = walls[2]
@@ -280,6 +283,12 @@ def processTransscriptionData(rawData, bad_image, rotated_image, puzzlePiece, cl
 		transcriptData.link5 = linkJoiner.join(edges[4])
 		transcriptData.link6 = linkJoiner.join(edges[5])
 
+		hashStr = center + ' ' + str(1 if walls[0] == True else 0) + str(1 if walls[1] == True else 0) + str(1 if walls[3] == True else 0) + \
+			str(1 if walls[4] == True else 0) + str(1 if walls[4] == True else 0) + str(1 if walls[5] == True else 0) + ' ' + \
+			transcriptData.link1 + ' ' + transcriptData.link2 + ' ' + transcriptData.link3 + ' ' + \
+			transcriptData.link4 + ' ' + transcriptData.link5 + ' ' + transcriptData.link6
+
+		transcriptData.datahash = hash_my_data(hashStr)
 		if rotated_image and bool(rotated_image) == True:                                                                                                                                                                                                                           transcriptData.orientation = "wrong"
 
 		transcriptData.save()
@@ -333,7 +342,8 @@ def determineConfidence(puzzlepieceId):
 
 	hashes = {}
 	confidenceRatio = 70
-	rotatedConfidenceRatio = 90
+	rotatedConfidenceRatio = 75
+	confidenceThreshold = 0 # We set this programmatically later
 	minSubmissions = 5
 	rotatedMinSubmissions = 8
 	badCount = 0
@@ -361,6 +371,12 @@ def determineConfidence(puzzlepieceId):
 	if rotationCount > 0:
 		setOrUpdateRotatedImage(puzzlepieceId, rotationCount)
 
+	# Adjust totalCount, we will exclude bad Image submissions
+	for d in data:
+		if d.bad_image:
+			totalCount -= 1
+			continue
+
 	# Is there enough data to determine a confidence level?
 	# If no, create or update a tracker entry.
 	if not rotationCount and totalCount < minSubmissions:
@@ -371,19 +387,14 @@ def determineConfidence(puzzlepieceId):
 		return
 
 	for d in data:
-		# Skip "bad image" flags.
-		if d.bad_image:
-			totalCount -= 1
-			continue
 		if d.datahash not in hashes:
 			hashes[d.datahash] = 0
 		hashes[d.datahash] = hashes[d.datahash] + 1
-	# solution threshold count is...
-	# This was -5, I think that's the minSubmissions? mkava knows for sure
+	# solution confidence threshold is...
 	if not rotationCount:
-		threshold = ((totalCount * confidenceRatio) / 100) - minSubmissions
+		confidenceThreshold = confidenceRatio
 	else:
-		threshold = ((totalCount * rotatedConfidenceRatio) / 100) - rotatedMinSubmissions
+		confidenceThreshold = rotatedConfidenceRatio
 
 	biggest = 0
 	biggesthash = None
@@ -397,7 +408,7 @@ def determineConfidence(puzzlepieceId):
 		# Update the confidence...
 		tracker = setOrUpdateConfidenceTracking(puzzlepieceId, confidence)
 
-		if biggest >= threshold:
+		if confidence >= confidenceThreshold:
 			# find the first transcription data object with the hash...
 			for d in data:
 				if d.datahash == biggesthash:
@@ -615,7 +626,7 @@ def exportVerifiedCSV(request):
 
 	return response
 
-@cache_page(60 * 15)
+@cache_page(60 * 30)
 def exportPiecesCSV(request):
 	response = HttpResponse(content_type = 'text/plain')
 	writer = csv.writer(response)

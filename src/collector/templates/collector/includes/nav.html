@@ -4,12 +4,14 @@
 	<a href="{% url 'transcriptionGuide' %}">Transcription Guide</a> &nbsp;||&nbsp;
 	<a href="{% url 'transcribe' %}">Transcribe Something</a> &nbsp;||&nbsp;
 	<a href="{% url 'puzzlepieceSubmit' %}">Submit New Puzzle Piece</a> &nbsp;||&nbsp; 
-	<a href="{% url 'puzzlepieceIndex' %}">View Newest Pieces</a> &nbsp;||&nbsp;
+	<a href="{% url 'puzzlepieceIndex' %}">View Recent Image Submissions</a> &nbsp;||&nbsp;
 	<a href="{% url 'confidenceIndex' %}">View All Confidence Ratings</a> &nbsp;||&nbsp;
-	<a href="{% url 'transcriptions' %}">View All Transcriptions</a> &nbsp;||&nbsp;
+	<a href="{% url 'transcriptions' %}">View Latest Transcriptions</a> &nbsp;||&nbsp;
 	<a href="{% url 'confidenceSolutionIndex' %}">View All Found Solutions</a>
 	}<br />
 	{
-        <a href="{% url 'exportVerifiedCSV' %}">CSV export of found solutions</a>
+        <a href="{% url 'exportVerifiedCSV' %}">CSV export of found solutions</a> &nbsp;||&nbsp;
+        <a href="{% url 'exportPiecesCSV' %}">CSV export of all puzzle pieces</a> &nbsp;||&nbsp;
+        <a href="{% url 'exportTranscriptionsCSV' %}">CSV export of all transcriptions received</a>
 	}
 </div>
