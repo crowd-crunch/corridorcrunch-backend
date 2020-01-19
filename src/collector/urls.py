@@ -22,4 +22,7 @@ urlpatterns = [
 	path("confidence/<int:confidence_id>", views.confidenceDetail, name="confidenceDetail"),
 	path("solutions", views.ConfidenceSolutionIndex.as_view(), name="confidenceSolutionIndex"),
 	path("solutions/<int:solution_id>", views.confidenceSolutionDetail, name="confidenceSolutionDetail"),
+	path("export/verified/csv", views.exportVerifiedCSV, name="exportVerifiedCSV"),
+	path("export/pieces/csv", views.exportPiecesCSV, name="exportPiecesCSV"),
+	path("export/transcriptions/csv", views.exportTranscriptionsCSV, name="exportTranscriptionsCSV"),
 ]
