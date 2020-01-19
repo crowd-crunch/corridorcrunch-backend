@@ -49,16 +49,18 @@ jobs:
 
         - name: run playbooks/configure
           run: |
-            ansible-playbook ops/ansible/configure.yml \
+            ansible-playbook \
               -i ${{ secrets.DEV_DEPLOY_URL }}, \
               -u ${{ secrets.DEV_DEPLOY_USER }} \ 
-              --private-key=ssh_deploykey
+              --private-key=ssh_deploykey \
+              ops/ansible/configure.yml
 
         - name: run playbooks/deploy
           run: |
-            ansible-playbook ops/ansible/configure.yml \
+            ansible-playbook \
               -i ${{ secrets.DEV_INSTANCE_URL }}, \
               -u ${{ secrets.DEV_DEPLOY_USER }} \
               --private-key=ssh_deploykey \
               --extra-vars=${{ secrets.ANSIBLE_ENV_DEV }} \
-              --extra-vars='{"docker":{"registry": "$REGISTRY","user":"$USERNAME","pass":"${{ secrets.GITHUB_TOKEN }}"}'
+              --extra-vars='{"docker":{"registry": "$REGISTRY","user":"$USERNAME","pass":"${{ secrets.GITHUB_TOKEN }}"}' \
+              ops/ansible/deploy.yml
