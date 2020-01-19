@@ -83,34 +83,36 @@ def findImage(url):
 		return None
 
 def findUnconfidentPuzzlePieces(self):
-	import random
-	imgPoolSize = 100
-
-	client_ip_hash = hash_my_data(UtilityOps.UtilityOps.GetClientIP(self.request))
-	# We want to order by transCount descending to get faster results. We do not show anything definitely flagged as bad; that already has been solved; or that this IP (hash) has offered a transcription for
-	result = PuzzlePiece.objects.raw('SELECT * FROM collector_puzzlepiece WHERE id NOT IN (SELECT puzzlePiece_id FROM collector_confidentsolution) ' + \
-					'AND id NOT IN (SELECT puzzlePiece_id FROM collector_badimage) AND id not IN (SELECT puzzlePiece_id FROM collector_transcriptiondata WHERE ip_address = "' + \
-					client_ip_hash + '") ORDER BY priority DESC, transCount DESC')
+	# We want to order by transCount descending to get faster results. We do not show anything definitely flagged as bad; that already has been solved
+	# Allow multiple transcriptions by one person - at the current load the database query is just to expensive
+	result = PuzzlePiece.objects.raw("""
+		SELECT * FROM
+			(SELECT * FROM collector_puzzlepiece WHERE
+				id NOT IN (SELECT puzzlePiece_id FROM collector_confidentsolution) AND
+				id NOT IN (SELECT puzzlePiece_id FROM collector_badimage)
+				ORDER BY priority DESC, transCount DESC
+				LIMIT 100
+			) AS current_transcriptions
+		ORDER BY RAND()
+		LIMIT 1
+	""")
 	# Want less than a certain confidence.
 	# X or more "bad image" records will disqualify from showing up again.
-	#print(result.query)
+
 	if len(result) > 0:
-		#index = random.randint(0, len(result)-1)
-		#Randomly one of the top N, imgPoolSize above
-		index = random.randint(0, min(len(result)-1, imgPoolSize-1))
 		# Add an isImage that we'll reference in the template, this allows us to handle generic links
-		parsedUrl = urlparse(result[index].url)
+		parsedUrl = urlparse(result[0].url)
 		if parsedUrl.path.lower().endswith(".jpg") or parsedUrl.path.lower().endswith(".png") or parsedUrl.path.lower().endswith(".jpeg"):
-			result[index].isImage = True
+			result[0].isImage = True
 		else:
-			result[index].isImage = False
+			result[0].isImage = False
 		# Warn if rotateod
-		rotated = PuzzlePiece.objects.raw('SELECT id FROM collector_rotatedimage WHERE puzzlePiece_id = ' + str(result[index].id))
+		rotated = PuzzlePiece.objects.raw('SELECT id FROM collector_rotatedimage WHERE puzzlePiece_id = ' + str(result[0].id))
 		if rotated:
-			result[index].isRotated = True
+			result[0].isRotated = True
 		else:
-			result[index].isRotated = False
-		return result[index]
+			result[0].isRotated = False
+		return result[0]
 	return None
 
 
