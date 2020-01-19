@@ -4,7 +4,7 @@
 
 <a href="{% url 'puzzlepieceView' confidence.puzzlePiece.id %}">Puzzle Piece</a>
 
-{% if confidence.confidence < 70 %}
+{% if confidence.confidence < 80 %}
 <form action="" method="post">
 {% csrf_token %}
 <input type="submit" name="rerun" value="Re-run Confidence Check">
