@@ -41,9 +41,7 @@ class PuzzlePieceSerializer(serializers.ModelSerializer):
         # If extending this, be _very_ careful about complexity, because
         # this computation is done on GET request for each PuzzlePiece
         # individually.
-        if normalised_url.endswith(".jpg")
-        or normalised_url.endswith(".png")
-        or normalised_url.endswith(".jpeg"):
+        if normalised_url.endswith(".jpg") or normalised_url.endswith(".png") or normalised_url.endswith(".jpeg"):
             return True
         return False
 
