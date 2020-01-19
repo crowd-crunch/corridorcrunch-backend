@@ -63,4 +63,4 @@ jobs:
           env:
             ANSIBLE_VAULT_PASSWORD_FILE: "./.ansible-vault-pass"
           run: |
-            ansible-playbook ./ops/ansible/deploy.yml -i ${{ secrets.DEV_DEPLOY_URL }}, -u ${{ secrets.DEV_DEPLOY_USER }} --extra-vars='{"varsfile": "dev.yml","docker":{"registry": "$REGISTRY","user":"$USERNAME","pass":"${{ secrets.GITHUB_TOKEN }}"}'
+            ansible-playbook ./ops/ansible/deploy.yml -i ${{ secrets.DEV_DEPLOY_URL }}, -u ${{ secrets.DEV_DEPLOY_USER }} --extra-vars='{"varsfile": "dev.yml","docker":{"registry": "$REGISTRY","user":"$USERNAME","pass":"${{ secrets.GITHUB_TOKEN }}"}}'

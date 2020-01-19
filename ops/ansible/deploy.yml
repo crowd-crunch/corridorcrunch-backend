@@ -1,7 +1,7 @@
 ---
 - hosts: all
   become: true
-  vars_files: 
+  vars_files:
     - "{{ playbook_dir }}/vars/{{ varsfile }}"
   environment:
     URL: "{{ vars.URL }}"
@@ -14,7 +14,7 @@
     SQL_PORT: "{{ vars.SQL_PORT }}"
     SQL_PASSWORD_ROOT: "{{ vars.SQL_PASSWORD_ROOT }}"
     TRAEFIK_AUTHSTRING: "{{ vars.TRAEFIK_AUTHSTRING }}"
-  
+
   tasks:
     - name: create application directory
       file:
