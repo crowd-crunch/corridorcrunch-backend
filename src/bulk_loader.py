@@ -5,6 +5,8 @@ from collector.models import PuzzlePiece
 from urllib.parse import urlparse
 import hashlib
 import requests
+import getopt
+import sys
 
 def hash_my_data(url):
         url = url.encode("utf-8")
@@ -13,7 +15,23 @@ def hash_my_data(url):
         return hex_dig
 
 def main():
-	with open("images.txt", "r") as infile:
+	inputfile = "images.txt"
+	priority = 0
+	try:
+		opts, args = getopt.getopt(sys.argv[1:],"hi:p:",["ifile=","priority="])
+	except getopt.GetoptError:
+		print ('bulk_loader.py -i <inputfile> -p <priority as integer>')
+		sys.exit(2)
+	for opt, arg in opts:
+		if opt == '-h':
+			print ('bulk_loader.py -i <inputfile> -p <priority as integer>')
+			sys.exit()
+		elif opt in ("-i", "--ifile"):
+			inputfile = str(arg)
+		elif opt in ("-p", "--priority"):
+			priority = int(arg)
+	
+	with open(inputfile, "r") as infile:
 		data = infile.readlines()
 
 	for line in data:
@@ -36,6 +54,7 @@ def main():
 			i.hash = hash_my_data(line)
 			i.ip_address = "127.0.0.1"
 			i.approved = True
+			i.priority = priority
 			i.save()
 		except KeyError as ex:
 			print ("There was an issue with your request.")

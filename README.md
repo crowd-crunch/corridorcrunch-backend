@@ -107,9 +107,102 @@ python manage.py runserver 8000
 
 
 # TODO:
-- [ ] Needs a bulk add for images...
 - [ ] Needs a approval process for submitted images...
-- [ ] Needs a prettification badly...
 - [ ] The 19 lore puzzle pieces should be filtered out of the results
 - [ ] Dockerize app and figure out deployment
 - [ ] update this readme lmao
+
+# Rough guide to spinning this up as a dev server from scratch. Is missing notes on lup (mount local dir) and general iteration loop
+Assuming a fresh Ubuntu 18.04 host
+
+From the ~ directory, here assuming a non-root user
+
+sudo apt update  
+sudo apt upgrade  
+Restart services automatically and keep local versions when asked  
+
+Some of these upgrades require reboot, let's do that now  
+sudo reboot  
+
+sudo apt install direnv  
+sudo apt install docker  
+sudo apt install docker-compose  
+
+sudo usermod -aG docker $USER  
+
+Create .vimrc  
+vi .vimrc  
+set noexpandtab  
+:set background=dark  
+
+Add to the very end of .bashrc  
+vi .bashrc  
+eval "$(direnv hook bash)"  
+LS_COLORS=$LS_COLORS:'di=1;44:' ; export LS_COLORS  
+
+Log out and back in  
+
+Minimal git setup  
+git config --global user.name "<Your name>"  
+git config --global user.email <Your email>  
+git config --global core.autocrlf input  
+
+If you just want to play with it and you don't intend to submit code:  
+git clone git@github.com:Corridors-of-Time-Transcription/puzzlepieces.git  
+
+If you DO want to submit code and PRs, please:  
+- Fork to your own repo  
+- On your dev server, create keys  
+ssh-keygen -o -b 4096 -t rsa   
+cat .ssh/id_rsa.pub  
+
+Go to your github settings, SSH and GPG keys, and set this as a "New SSH key". Title could be "Puzzle Test Server" or something descriptive.  
+
+Get the URL for this from your github fork, "Clone with SSH", and  
+git clone <URL github gave you>  
+cd puzzlepieces  
+git remote add upstream git@github.com:Corridors-of-Time-Transcription/puzzlepieces.git  
+git remote -v  
+
+cd puzzlepieces  
+direnv allow  
+
+Now edit docker files depending on how you'll access your machine. Yes we know our docker routing is shonky. We invite help! Get in touch with @ebuch.  
+
+So, figure out how you access your dev server. If it's through localhost, no changes needed. If it's through another IP or a name, you'll need that IP or that name, and we'll tell docker about it. Notably that's what you use to get to it, which may not be its local IP.  
+
+cd ops  
+vi docker-compose.dev.yml  
+Find "VIRTUAL_HOST=localhost" and change to "VIRTUAL_HOST=<whatever-IP-or-name-you-use-to-connect>"  
+
+Rinse repeat for docker-compose.dev.local.yml  
+
+Environment files next. Same thing here, docker help appreciated  
+cp db-dev.env.example db-dev.env  
+cp production.env.example production.env  
+cp development.env.example development.env  
+
+cd ..  
+git update-index --assume-unchanged ops/docker-compose.dev.local.yml  
+git update-index --assume-unchanged ops/docker-compose.dev.yml  
+
+Back to puzzlepieces and spin this up. We're using pz, which is just a little script wrapped around docker  
+
+pz build  
+pz up  
+
+You should be able to get to http://<your-machine> and docker ps should show you three containers  
+
+Syncing with upstream master, assuming your own fork and a fork and branch model  
+git checkout master  
+git pull upstream master  
+git push  
+
+And get the changes into your environment  
+
+pz down  
+pz build  
+pz up  
+
+The DB is named "puzzlepieces", the user is "puzzler" and the password "puzzling"  
+
