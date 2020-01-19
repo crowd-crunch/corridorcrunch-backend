@@ -60,6 +60,20 @@ def findImage(url):
 		if res.status_code == 200:
 			return turl
 		return None
+	elif host in ["gayazo.com"]:
+		turl = "https://i.gayazo.com" + urlparse(url).path + ".png"
+		res = requests.head(turl)
+		if res.status_code == 200:
+			return turl
+		turl = "https://i.gayazo.com" + urlparse(url).path + ".jpg"
+		res = requests.head(turl)
+		if res.status_code == 200:
+			return turl
+		turl = "https://i.gayazo.com" + urlparse(url).path + ".jpeg"
+		res = requests.head(turl)
+		if res.status_code == 200:
+			return turl
+		return None
 	else:
 		return None
 
