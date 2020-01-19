@@ -556,7 +556,7 @@ def exportVerifiedCSV(request):
 	writer.writerow([
 		"Image",
 		"Center",
-		"Walls",
+		"Openings",
 		"Link1",
 		"Link2",
 		"Link3",
@@ -569,8 +569,8 @@ def exportVerifiedCSV(request):
 	])
 
 	for solution in ConfidentSolution.objects.all():
-		w = [solution.wall1, solution.wall2, solution.wall3, solution.wall4, solution.wall5, solution.wall6]
-		walls = ",".join(str(i+1) for i in range(6) if w[i])
+		walls = [solution.wall1, solution.wall2, solution.wall3, solution.wall4, solution.wall5, solution.wall6]
+		openings = ",".join(str(i+1) for i in range(6) if not walls[i])
 
 		rotated = PuzzlePiece.objects.raw('SELECT id FROM collector_rotatedimage WHERE puzzlePiece_id = ' + str(solution.puzzlePiece.id))
 		if rotated:
@@ -580,7 +580,7 @@ def exportVerifiedCSV(request):
 		writer.writerow([
 			solution.puzzlePiece.url,
 			solution.center,
-			walls,
+			openings,
 			solution.link1,
 			solution.link2,
 			solution.link3,
@@ -639,7 +639,7 @@ def exportTranscriptionsCSV(request):
 
 	for trans in TranscriptionData.objects.all():
 		walls = [trans.wall1, trans.wall2, trans.wall3, trans.wall4, trans.wall5, trans.wall6]
-		openings = ",".join(str(i+1) for i in range(6) if walls[i])
+		openings = ",".join(str(i+1) for i in range(6) if not walls[i])
 
 		writer.writerow([
 			trans.puzzlePiece.url,
