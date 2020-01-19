@@ -45,7 +45,9 @@ jobs:
             pip install ansible==2.9.2 requests
 
         - name: setup ssh
-          run: echo "${{ secrets.DEV_DEPLOY_SSH_PRIVATEKEY }}" > ./ssh_deploykey
+          run: |
+            echo "${{ secrets.DEV_DEPLOY_SSH_PRIVATEKEY }}" > ./ssh_deploykey
+            ssh-keyscan "${{ secrets.DEV_INSTANCE_URL }}" > ~/.ssh/known_hosts
 
         - name: run playbooks/configure
           run: |
