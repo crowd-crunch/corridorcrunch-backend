@@ -22,9 +22,13 @@ import csv
 import hashlib
 import hmac
 import requests
+import re
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import mixins, status, viewsets
+
+# Regex pattern for text submissions
+textSubmissionPattern = re.compile(r"^\s*(?P<center>(Blank|Plus|Clover|Hex|Snake|Diamond|Cauldron|B|P|C|H|S|D|T))\s*(?P<sides>([1-6])(\s*,\s*[1-6]){0,5})(?P<links>(\s*[BPCHSDT]{7}){6})\s*$", re.IGNORECASE)
 
 def hash_my_data(url):
 	url = url.encode("utf-8")
@@ -226,7 +230,11 @@ def processTranscription(request, puzzlepiece_id):
 		try:
 			data = json.loads(data)
 		except Exception:
-			data = parse_data_string(data)
+			match = textSubmissionPattern.match(data)
+			if match:
+				data = parse_data_string(match)
+			else:
+				data = None
 
 		puzzlePiece = get_object_or_404(PuzzlePiece, pk=puzzlepiece_id)
 		# Hash IP bcs of GDPR
@@ -243,37 +251,26 @@ def processTranscription(request, puzzlepiece_id):
 
 
 
-def parse_data_string(rawData):
-    is_tab_separated = "\t" in rawData
-    
-    if is_tab_separated:
-        center, opening_string, sides = rawData.split("\t", 2)
-    else:
-        center, opening_string, sides = rawData.split(" ", 2)
-    
-    if not (center and opening_string and sides):
-        # String is malformed
-        return
-    
+def parse_data_string(matchedData):
     data_dict = {}
-    
+
     # Sometimes the center is fully written out. Other times it is not.
     # This allows for both.
-    data_dict["center"] = "T" if center == "Cauldron" else center[0].upper()
-    
+    data_dict["center"] = "T" if matchedData.group('center') == "Cauldron" else matchedData.group('center').upper()[0]
+
     # Wall list of length 6. Default is wall true, since string contains list of
     # openings.
-    data_dict["walls"] = [True]*6
-    for opening in opening_string.split(","):
-        data_dict["walls"][int(opening)-1] = False
-    
+    data_dict["walls"] = [True] * 6
+    for opening in matchedData.group('sides').split(","):
+        data_dict["walls"][int(opening) - 1] = False
+
     # Node list. Split string into list of strings, then split each side
     # into a list of characters.
     data_dict["nodes"] = []
-    side_list = sides.split("\t") if is_tab_separated else sides.split(" ")
+    side_list = matchedData.group('links').split()
     for side in side_list:
         data_dict["nodes"].append(list(side.upper()))
-	
+
     return data_dict
 
 
