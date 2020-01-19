@@ -109,6 +109,8 @@ def puzzlepieceSubmit(request):
 	try:
 		if request.method == "POST":
 			url = request.POST["url"].strip()
+			if len(url) > 200:
+				raise ValueError('You havin\' a laff, mate? A URL that long? Yeah no.')
 			host = urlparse(url).hostname
 			if host not in ["cdn.discordapp.com", "media.discordapp.net", "i.gyazo.com", "i.imgur.com"]:
 				raise ValueError('We only accept images from cdn.discordapp.com, media.discordapp.net, i.gyazo.com and i.imgur.com right now.')
