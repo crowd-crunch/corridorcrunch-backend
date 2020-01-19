@@ -85,6 +85,7 @@ class ConfidentSolution(models.Model):
 	puzzlePiece = models.ForeignKey(PuzzlePiece, on_delete=models.CASCADE, related_name="confidentsolutions")
 	last_modified = models.DateTimeField(verbose_name="last modified date", auto_now=True)
 	confidence = models.PositiveIntegerField(default=0,verbose_name="how confident are we in this image, 0 to 100")
+	datahash = models.CharField(max_length=64, default="", verbose_name="sha256 hash for easier comparisons")
 
 	center = models.CharField(max_length=20, verbose_name="center")
 
