@@ -24,12 +24,12 @@
 
     - name: place composefile
       copy:
-        src: "{{ playbook_dir }}/files/docker-compose.yml"
+        src: "{{ playbook_dir }}/files/compose/docker-compose.yml"
         dest: "/puzzlepieces/docker-compose.yml"
         owner: root
         group: root
         backup: yes
-        validate: "docker-compose -f %s config "
+        validate: "docker-compose -f %s config"
 
     - name: login to docker registry
       shell: "docker login {{ docker_registry }} --username {{ docker_user }} --password {{ docker_pass }}"
@@ -40,7 +40,7 @@
       docker_compose:
         project_src: "/puzzlepieces"
         state: present
-        pull: no
+        pull: yes
 
   handlers:
     - name: docker logout

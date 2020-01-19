@@ -1,0 +1,60 @@
+---
+- hosts: all
+  become: false
+  vars_files:
+    - "{{ playbook_dir }}/vars/{{ varsfile }}"
+  vars:
+    projectdir: /home/ubuntu/puzzlepieces
+    machineuser: ubuntu
+  environment:
+    URL: "{{ URL }}"
+    TLS_EMAIL: "{{ TLS_EMAIL }}"
+    IMAGE_TAG: "{{ IMAGE_TAG }}"
+    IS_DEBUG: "{{ IS_DEBUG }}"
+    DJANGO_SECRET_KEY: "{{ DJANGO_SECRET_KEY }}"
+    SQL_USER: "{{ SQL_USER }}"
+    SQL_PASSWORD: "{{ SQL_PASSWORD }}"
+    SQL_PORT: "{{ SQL_PORT }}"
+    SQL_PASSWORD_ROOT: "{{ SQL_PASSWORD_ROOT }}"
+
+  tasks:
+    - name: create application directory
+      file:
+        path: {{ projectdir }}
+        state: directory
+        mode: "0755"
+
+    - name: place and validate backend configuration
+      copy:
+        src: "{{ playbook_dir }}/files/stack/backend.yml"
+        dest: "{{ projectdir }}/backend.yml"
+        owner: {{ machineuser }}
+        group: {{ machineuser }}
+        backup: yes
+        validate: "docker-compose -f %s config "
+
+    - name: place and validate proxy configuration
+      copy:
+        src: "{{ playbook_dir }}/files/stack/proxy.yml"
+        dest: "{{ projectdir }}/proxy.yml"
+        owner: {{ machineuser }}
+        group: {{ machineuser }}
+        backup: yes
+        validate: "docker-compose -f %s config "
+
+    - name: login to docker registry
+      shell: "docker login {{ docker_registry }} --username {{ docker_user }} --password {{ docker_pass }}"
+
+    - name: deploy proxy
+      docker_stack:
+        compose: "{{ projectdir }}/proxy.yml"
+        with_registry_auth: yes
+        state: present
+        pull: yes
+
+    - name: deploy backend
+      docker_stack:
+        compose: "{{ projectdir }}/backend.yml"
+        with_registry_auth: yes
+        state: present
+        pull: yes

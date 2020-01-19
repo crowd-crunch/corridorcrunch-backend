@@ -24,7 +24,7 @@
 
     - name: place composefile
       copy:
-        src: "{{ playbook_dir }}/files/docker-compose.yml"
+        src: "{{ playbook_dir }}/files/compose/docker-compose.yml"
         dest: "/puzzlepieces/docker-compose.yml"
         owner: root
         group: root

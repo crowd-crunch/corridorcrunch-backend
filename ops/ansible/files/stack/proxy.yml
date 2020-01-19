@@ -1,0 +1,54 @@
+---
+version: '3.7'
+
+services:
+  proxy:
+    image:
+      traefik:v2.1
+    command:
+      - "--ping"
+      - "--accesslog"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+#      - "--providers.docker.swarmMode=true"
+      - "--entrypoints.web.address=:80"
+      - "--entryPoints.web.forwardedHeaders.trustedIPs=127.0.0.1/32,10.100.0.0/16"
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
+    networks:
+      - proxy
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    deploy:
+      mode: global
+      #restart_policy:
+      #  condition: on-failure
+      rollback_config:
+        failure_action: rollback
+        monitor: 60s
+        delay: 10s
+        order: stop-first
+      placement:
+        constraints:
+          - node.role == worker
+
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+networks:
+  proxy:
+    external: true
