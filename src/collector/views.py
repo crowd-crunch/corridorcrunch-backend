@@ -73,7 +73,7 @@ def findUnconfidentPuzzlePieces(self):
 	#print(result.query)
 	if len(result) > 0:
 		#index = random.randint(0, len(result)-1)
-		#Randomly one of the top N, imgPoolSize above 
+		#Randomly one of the top N, imgPoolSize above
 		index = random.randint(0, min(len(result)-1, imgPoolSize-1))
 		# Add an isImage that we'll reference in the template, this allows us to handle generic links
 		if result[index].url.lower().endswith(".jpg") or result[index].url.lower().endswith(".png") or result[index].url.lower().endswith(".jpeg"):
@@ -117,8 +117,8 @@ def puzzlepieceSubmit(request):
 			host = urlparse(url).hostname
 			if host not in ["cdn.discordapp.com", "media.discordapp.net", "i.gyazo.com", "i.imgur.com"]:
 				raise ValueError('We only accept images from cdn.discordapp.com, media.discordapp.net, i.gyazo.com and i.imgur.com right now.')
-			if not (url.lower().endswith(".jpg") or url.lower().endswith(".png")):
-				raise ValueError('Please make sure your link ends with .jpg or .png. Direct links to images work best with our current site.')
+			if not (url.lower().endswith(".jpg") or url.lower().endswith(".png") or url.lower().endswith(".jpeg")):
+				raise ValueError('Please make sure your link ends with .jpg or .jpeg or .png. Direct links to images work best with our current site.')
 			if url.find("http",8,len(url)) != -1:
 				raise ValueError('Found http in the middle of the URL - did you paste it twice?' + url)
 			res = requests.head(url)

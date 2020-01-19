@@ -21,6 +21,8 @@ def main():
 			line = line.rstrip()
 			if not line:
 				continue
+			if len(line) > 200:
+				raise ValueError('URL too long to fit')
 			print(line)
 			host = urlparse(line).hostname 
 			if host in ["tjl.co","gamerdvr.com","dropbox.com","www.gamerdvr.com","www.dropbox.com"]:
