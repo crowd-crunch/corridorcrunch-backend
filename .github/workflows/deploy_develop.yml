@@ -1,0 +1,64 @@
+name: Development Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+    publish_latest:
+      runs-on: ubuntu-latest
+      env:
+        TAG: docker.pkg.github.com/corridors-of-time-transcription/puzzlepieces/puzzlepieces:latest
+        REGISTRY: docker.pkg.github.com
+        USERNAME: corridors-of-time-transcription
+      steps:
+      - uses: actions/checkout@v2
+
+      - name: login to registry
+        run: docker login $REGISTRY --username $USERNAME --password ${{ secrets.GITHUB_TOKEN }}
+
+      - name: build image
+        run: docker build . --file Dockerfile --tag ${TAG}
+
+      - name: publish image
+        run: docker push ${TAG}
+
+    deploy_latest:
+      needs: publish_latest
+      runs-on: ubuntu-latest
+      name: deploy latest on development instance with ansible
+      env:
+        REGISTRY: docker.pkg.github.com
+        USERNAME: corridors-of-time-transcription
+      steps:
+        - uses: actions/checkout@v1
+
+        - name: setup ssh agent
+          uses: webfactory/ssh-agent@v0.2.0
+          with:
+            ssh-private-key: ${{ secrets.DEV_DEPLOY_SSH_PRIVATEKEY }}
+        
+        - name: setup python
+          uses: actions/setup-python@v1.1.1
+          with:
+            python-version: 3.8
+        
+        - name: install dependencies
+          run: |
+            python -m pip install --upgrade pip
+            pip install ansible==2.9.2 requests
+
+        - name: run playbooks/configure
+          run: |
+            ansible-playbook ops/ansible/configure.yml \
+              -i ${{ secrets.DEV_DEPLOY_URL }}, \
+              -u ${{ secrets.DEV_DEPLOY_USER }}
+
+        - name: run playbooks/deploy
+          run: |
+            ansible-playbook ops/ansible/configure.yml \
+              -i ${{ secrets.DEV_INSTANCE_URL }}, \
+              -u ${{ secrets.DEV_DEPLOY_USER }} \
+              --extra-vars=${{ secrets.ANSIBLE_ENV_DEV }} \
+              --extra-vars='{"docker":{"registry": "$REGISTRY","user":"$USERNAME","pass":"${{ secrets.GITHUB_TOKEN }}"}'

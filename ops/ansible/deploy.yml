@@ -30,7 +30,7 @@
         validate: "docker-compose -f %s config "
 
     - name: login to docker registry
-      shell: "docker login docker.pkg.github.com --username {{ gh.user }} --password {{ gh.pass }}"
+      shell: "docker login {{ docker.registry }} --username {{ docker.user }} --password {{ docker.pass }}"
       notify:
         - docker logout
 

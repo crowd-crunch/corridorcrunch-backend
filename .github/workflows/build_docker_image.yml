@@ -6,12 +6,10 @@ on:
       - master
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
+
     - name: build image
-      run: docker build . --file Dockerfile --tag puzzlepieces:latest
+      run: docker build . --file Dockerfile --tag puzzlepieces:$(git rev-parse --short "$GITHUB_SHA")
