@@ -120,10 +120,12 @@ def findUnconfidentPuzzlePieces(self):
 	return None
 
 
+@cache_page(60 * 15)
 def index(request):
 	template = loader.get_template("collector/index.html")
 	return HttpResponse(template.render(None, request))
 
+@cache_page(60 * 15)
 def transcriptionGuide(request):
 	template = loader.get_template("collector/transcriptionGuide.html")
 	return HttpResponse(template.render(None, request))
@@ -180,6 +182,7 @@ def puzzlepieceSubmit(request):
 	return HttpResponse(template.render(context, request))
 
 
+@cache_page(60 * 15)
 class PuzzlepieceIndex(generic.ListView):
 	template_name = 'collector/latest.html'
 	context_object_name = 'latest'
@@ -351,6 +354,7 @@ def processTransscriptionData(rawData, bad_image, rotated_image, puzzlePiece, cl
 	return errors, transcriptData
 
 
+@cache_page(60 * 15)
 class TranscriptionsIndex(generic.ListView):
 	template_name = 'collector/transcriptions.html'
 	context_object_name = 'latest'
@@ -372,6 +376,7 @@ def transcriptionsDetail(request, transcription_id):
 	return render(request, 'collector/transcriptionDetail.html', context)
 
 
+@cache_page(60 * 15)
 class ConfidenceIndex(generic.ListView):
 	model = ConfidenceTracking
 	template_name = 'collector/confidenceIndex.html'
