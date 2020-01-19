@@ -8,6 +8,7 @@ class PuzzlePiece(models.Model):
 	submitted_date = models.DateTimeField(verbose_name="submitted date", auto_now_add=True)
 	last_modified = models.DateTimeField(verbose_name="last modified date", auto_now=True)
 	approved = models.NullBooleanField(verbose_name="is image approved for verification")
+	priority = models.PositiveIntegerField(default=0,verbose_name="Priority value in transcription queue")
 	transCount = models.PositiveIntegerField(default=0,verbose_name="Number of transcriptions received for this image")
 
 	def __str__(self):

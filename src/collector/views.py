@@ -79,13 +79,13 @@ def findImage(url):
 
 def findUnconfidentPuzzlePieces(self):
 	import random
-	imgPoolSize = 200
+	imgPoolSize = 100
 
 	client_ip_hash = hash_my_data(UtilityOps.UtilityOps.GetClientIP(self.request))
 	# We want to order by transCount descending to get faster results. We do not show anything definitely flagged as bad; that already has been solved; or that this IP (hash) has offered a transcription for
 	result = PuzzlePiece.objects.raw('SELECT * FROM collector_puzzlepiece WHERE id NOT IN (SELECT puzzlePiece_id FROM collector_confidentsolution) ' + \
 					'AND id NOT IN (SELECT puzzlePiece_id FROM collector_badimage) AND id not IN (SELECT puzzlePiece_id FROM collector_transcriptiondata WHERE ip_address = "' + \
-					client_ip_hash + '") ORDER BY transCount DESC')
+					client_ip_hash + '") ORDER BY priority DESC, transCount DESC')
 	# Want less than a certain confidence.
 	# X or more "bad image" records will disqualify from showing up again.
 	#print(result.query)
@@ -127,6 +127,8 @@ def transcriptionGuide(request):
 def puzzlepieceSubmit(request):
 	responseMessage = None
 	responseMessageSuccess = None
+	# New submissions are first in queue, but behind specific streamer requests
+	priority = 10
 
 	try:
 		if request.method == "POST":
@@ -149,6 +151,7 @@ def puzzlepieceSubmit(request):
 			newPiece.hash = hash_my_data(url)
 			# An IP is personal data as per GDPR, kid you not. Let's hash it, we just need something unique
 			newPiece.ip_address = hash_my_data(UtilityOps.UtilityOps.GetClientIP(request))
+			newPiece.priority = priority
 			newPiece.save()
 			responseMessageSuccess = "Puzzle Piece image submitted successfully!"
 	except KeyError as ex:
