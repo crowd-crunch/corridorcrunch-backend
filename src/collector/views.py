@@ -411,7 +411,7 @@ def updateTransCount(puzzlepieceId, transCount):
 		return piece
 	except Exception as ex:
 		piece = None
-	
+
 def setOrUpdateBadImage(puzzlepieceId, badCount):
 	try:
 		bad = BadImage.objects.get(puzzlePiece_id=puzzlepieceId)
@@ -556,7 +556,7 @@ def exportVerifiedCSV(request):
 	writer.writerow([
 		"Image",
 		"Center",
-		"Openings",
+		"Walls",
 		"Link1",
 		"Link2",
 		"Link3",
@@ -569,8 +569,8 @@ def exportVerifiedCSV(request):
 	])
 
 	for solution in ConfidentSolution.objects.all():
-		walls = [solution.wall1, solution.wall2, solution.wall3, solution.wall4, solution.wall5, solution.wall6]
-		openings = ",".join(str(i+1) for i in range(6) if walls[i])
+		w = [solution.wall1, solution.wall2, solution.wall3, solution.wall4, solution.wall5, solution.wall6]
+		walls = ",".join(str(i+1) for i in range(6) if w[i])
 
 		rotated = PuzzlePiece.objects.raw('SELECT id FROM collector_rotatedimage WHERE puzzlePiece_id = ' + str(solution.puzzlePiece.id))
 		if rotated:
@@ -580,7 +580,7 @@ def exportVerifiedCSV(request):
 		writer.writerow([
 			solution.puzzlePiece.url,
 			solution.center,
-			openings,
+			walls,
 			solution.link1,
 			solution.link2,
 			solution.link3,
