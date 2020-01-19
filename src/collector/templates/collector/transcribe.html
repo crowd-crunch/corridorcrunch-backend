@@ -57,6 +57,7 @@
 			<ul>
 			<li>Transcribe the image below using <a target="_blank" rel="noopener noreferrer" href="https://tjl.co/corridors-of-time/">https://tjl.co/corridors-of-time/</a></li>
 			<li>Copy and paste the RAW JSON output from tjl.co into the box below and click submit. The raw JSON is everything between the { and } curly brackets, including those brackets themselves.</li>
+			<li>You can also use a normally formatted string, e.g. "Blank	6	THBPPHT	PPDDBCP	BPHDTHS	DSCDBPS	PSHPSCD	SHDDHHS"</li>
 			</ul>
 			<h4>Image Rotation:</h4>
 			{% if puzzlepiece.isRotated %}
@@ -82,7 +83,7 @@
 			<form action="{% url 'transcribeResults' puzzlepiece.id %}" id="transcribeform" method="post">
 				{% csrf_token %}
 				<div id="formleft">
-				Raw JSON<br/>
+				Raw JSON or String<br/>
 				<textarea id="datafield" name="data" form="transcribeform"></textarea>
 				</div>
 				<div id="formright">
