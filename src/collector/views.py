@@ -396,13 +396,13 @@ def determineConfidence(puzzlepieceId):
 	data = TranscriptionData.objects.filter(puzzlePiece_id=puzzlepieceId)
 
 	hashes = {}
-	confidenceRatio = 70
-	rotatedConfidenceRatio = 75
+	confidenceRatio = 80 
+	rotatedConfidenceRatio = 90
 	confidenceThreshold = 0 # We set this programmatically later
-	minSubmissions = 5
-	rotatedMinSubmissions = 8
+	minSubmissions = 10
+	rotatedMinSubmissions = 15
 	badCount = 0
-	badThreshold = 3
+	badThreshold = 4
 	rotationCount = 0
 	totalCount = len(data)
 	updateTransCount(puzzlepieceId,totalCount)
