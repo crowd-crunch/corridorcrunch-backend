@@ -136,10 +136,14 @@ def puzzlepieceSubmit(request):
 			if len(url) > 200:
 				raise ValueError('You havin\' a laff, mate? A URL that long? Yeah no.')
 			host = urlparse(url).hostname
-			if host not in ["cdn.discordapp.com", "media.discordapp.net", "i.gyazo.com", "i.imgur.com"]:
-				raise ValueError('We only accept images from cdn.discordapp.com, media.discordapp.net, i.gyazo.com and i.imgur.com right now.')
-			if not (url.lower().endswith(".jpg") or url.lower().endswith(".png") or url.lower().endswith(".jpeg")):
+			if host not in ["cdn.discordapp.com", "media.discordapp.net", "i.gyazo.com", "gyazo.com", "i.imgur.com", "imgur.com"]:
+				raise ValueError('We only accept images from cdn.discordapp.com, media.discordapp.net, (i.)gyazo.com and (i.)imgur.com right now.')
+			if host not in ["gyazo.com", "imgur.com"] and not (url.lower().endswith(".jpg") or url.lower().endswith(".png") or url.lower().endswith(".jpeg")):
 				raise ValueError('Please make sure your link ends with .jpg or .jpeg or .png. Direct links to images work best with our current site.')
+			if host in ["gyazo.com", "imgur.com"]:
+				turl = findImage(url)
+				if turl:
+					url = turl
 			if url.find("http",8,len(url)) != -1:
 				raise ValueError('Found http in the middle of the URL - did you paste it twice?' + url)
 			res = requests.head(url)
@@ -255,7 +259,7 @@ def parse_data_string(rawData):
     
     # Sometimes the center is fully written out. Other times it is not.
     # This allows for both.
-    data_dict["center"] = "T" if center == "Cauldron" else center[0]
+    data_dict["center"] = "T" if center == "Cauldron" else center[0].upper()
     
     # Wall list of length 6. Default is wall true, since string contains list of
     # openings.
@@ -268,8 +272,8 @@ def parse_data_string(rawData):
     data_dict["nodes"] = []
     side_list = sides.split("\t") if is_tab_separated else sides.split(" ")
     for side in side_list:
-        data_dict["nodes"].append(list(side))
-    
+        data_dict["nodes"].append(list(side.upper()))
+	
     return data_dict
 
 
@@ -342,7 +346,7 @@ def processTransscriptionData(rawData, bad_image, rotated_image, puzzlePiece, cl
 			transcriptData.link1 + ' ' + transcriptData.link2 + ' ' + transcriptData.link3 + ' ' + \
 			transcriptData.link4 + ' ' + transcriptData.link5 + ' ' + transcriptData.link6
 
-		transcriptData.datahash = hash_my_data(hashStr)
+		transcriptData.datahash = hash_my_data(hashStr.upper())
 		if rotated_image and bool(rotated_image) == True:                                                                                                                                                                                                                           transcriptData.orientation = "wrong"
 
 		transcriptData.save()
