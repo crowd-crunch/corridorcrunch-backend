@@ -2,7 +2,7 @@
 - hosts: all
   become: true
   vars_files:
-    - "{{ playbook_dir }}/vars/{{ varsfile }}"
+    - "{{ playbook_dir }}/../../vars/{{ varsfile }}"
   environment:
     URL: "{{ URL }}"
     TLS_EMAIL: "{{ TLS_EMAIL }}"
