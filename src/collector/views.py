@@ -200,7 +200,7 @@ def processTranscription(request, puzzlepiece_id):
 		try:
 			data = json.loads(data)
 		except Exception:
-			data = None
+			data = parse_data_string(data)
 
 		puzzlePiece = get_object_or_404(PuzzlePiece, pk=puzzlepiece_id)
 		# Hash IP bcs of GDPR
@@ -214,6 +214,41 @@ def processTranscription(request, puzzlepiece_id):
 		"transcript": transcriptData
 	}
 	return render(request, "collector/transcribeResults.html", context=context)
+
+
+
+def parse_data_string(rawData):
+    is_tab_separated = "\t" in rawData
+    
+    if is_tab_separated:
+        center, opening_string, sides = rawData.split("\t", 2)
+    else:
+        center, opening_string, sides = rawData.split(" ", 2)
+    
+    if not (center and opening_string and sides):
+        # String is malformed
+        return
+    
+    data_dict = {}
+    
+    # Sometimes the center is fully written out. Other times it is not.
+    # This allows for both.
+    data_dict["center"] = "T" if center == "Cauldron" else center[0]
+    
+    # Wall list of length 6. Default is wall true, since string contains list of
+    # openings.
+    data_dict["walls"] = [True]*6
+    for opening in opening_string.split(","):
+        data_dict["walls"][int(opening)-1] = False
+    
+    # Node list. Split string into list of strings, then split each side
+    # into a list of characters.
+    data_dict["nodes"] = []
+    side_list = sides.split("\t") if is_tab_separated else sides.split(" ")
+    for side in side_list:
+        data_dict["nodes"].append(list(side))
+    
+    return data_dict
 
 
 
