@@ -1,0 +1,4 @@
+[defaults]
+inventory = inventory.ini
+vault_password_file = ANSIBLE_VAULT_PASSWORD
+ansible_remote_user = root

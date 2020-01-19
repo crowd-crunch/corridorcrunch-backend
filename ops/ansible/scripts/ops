@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+bootstrap() {
+    cp ${SCRIPTDIR}/template_cfg/ANSIBLE_VAULT_PASSWORD.example ${SCRIPTDIR}/../ANSIBLE_VAULT_PASSWORD
+    cp ${SCRIPTDIR}/template_cfg/ansible.cfg.example ${SCRIPTDIR}/../ansible.cfg
+    cp ${SCRIPTDIR}/template_cfg/SECRETS.txt.example ${SCRIPTDIR}/../SECRETS.txt
+    cp ${SCRIPTDIR}/template_cfg/inventory.ini.example ${SCRIPTDIR}/../inventory.ini
+    echo "done setting up, please fill out the files now"
+}
+
+configure() {
+    source ${SCRIPTDIR}/../SECRETS.txt
+    ansible-playbook ${SCRIPTDIR}/../configure.yml -u root $@
+}
+
+deploy() {
+    source ${SCRIPTDIR}/../SECRETS.txt
+    ansible-playbook ${SCRIPTDIR}/../deploy.yml -u root \
+        --extra-vars "varsfile=dev.yml docker_registry=$REGISTRY_URL docker_user=$REGISTRY_USER docker_pass=$REGISTRY_PASS"
+}
+
+stop() {
+    source ${SCRIPTDIR}/../SECRETS.txt
+    ansible-playbook ${SCRIPTDIR}/../stop.yml -u root \
+        --extra-vars "varsfile=dev.yml docker_registry=$REGISTRY_URL docker_user=$REGISTRY_USER docker_pass=$REGISTRY_PASS"
+}
+
+restart() {
+    source ${SCRIPTDIR}/../SECRETS.txt
+    ansible-playbook ${SCRIPTDIR}/../restart.yml -u root \
+        --extra-vars "varsfile=dev.yml docker_registry=$REGISTRY_URL docker_user=$REGISTRY_USER docker_pass=$REGISTRY_PASS"
+}
+
+recreate() {
+    source ${SCRIPTDIR}/../SECRETS.txt
+    ansible-playbook ${SCRIPTDIR}/../restart.yml -u root \
+        --extra-vars "varsfile=dev.yml docker_registry=$REGISTRY_URL docker_user=$REGISTRY_USER docker_pass=$REGISTRY_PASS"
+}
+
+help() {
+    echo "about:"
+    echo "this tool lets you perform operations on the live servers from your local machine"
+    echo "make sure to have a filled out ANSIBLE_VAULT_PASSWORD file and inventory.ini in this (ops/ansible) directory."
+
+    echo "usage:"
+    echo ""
+    echo -e "setup <args>"
+    echo -e "\twrites configuration files so you can fill them out "
+    echo ""
+    echo -e "pb <path/to/playbook> <args>"
+    echo -e "\texecutes playbook"
+    echo ""
+    echo -e "configure <args>"
+    echo -e "\texecutes configure playbook "
+    echo ""
+    echo -e "deploy <args>"
+    echo -e "\texecutes deploy playbook "
+    echo ""
+    echo -e "start <args>"
+    echo -e "\texecutes start playbook "
+    echo ""
+    echo -e "stop <args>"
+    echo -e "\texecutes stop playbook "
+    echo ""
+    echo -e "restart <args>"
+    echo -e "\texecutes restart playbook "
+    echo ""
+    echo -e "recreate <args>"
+    echo -e "\texecutes recreate playbook "
+    echo ""
+    echo -e "destroy <args>"
+    echo -e "\texecutes destroy playbook "
+    echo ""
+    echo "EXAMPLE USAGE:"
+    echo -e "\tops deploy -l dev "
+}
+
+destroy() {
+    source ${SCRIPTDIR}/../SECRETS.txt
+    ansible-playbook ${SCRIPTDIR}/../destroy.yml \
+        --extra-vars "varsfile=dev.yml docker_registry=$REGISTRY_URL docker_user=$REGISTRY_USER docker_pass=$REGISTRY_PASS"
+}
+
+if [[ $1 == "help" ]]; then
+    help
+    exit 0
+elif [[ $1 == "setup" ]]; then
+    bootstrap
+    exit 0
+fi
+if [[ ! -f "${SCRIPTDIR}/../ANSIBLE_VAULT_PASSWORD" || ! -f "${SCRIPTDIR}/../inventory.ini" ]]; then
+    echo "ANSIBLE_VAULT_PASSWORD or inventory.ini file no exist, exiting.."
+    exit 1
+fi
+
+
+command=${1}
+shift
+${command} $@

@@ -32,16 +32,15 @@
         validate: "docker-compose -f %s config "
 
     - name: login to docker registry
-      shell: "docker login docker.pkg.github.com --username {{ docker_user }} --password {{ docker_pass }}"
+      shell: "docker login {{ docker_registry }} --username {{ docker_user }} --password {{ docker_pass }}"
       notify:
         - docker logout
 
-    - name: restart services
+    - name: deploy services
       docker_compose:
         project_src: "/puzzlepieces"
         state: present
-        pull: yes
-        recreate: always
+        pull: no
 
   handlers:
     - name: docker logout
