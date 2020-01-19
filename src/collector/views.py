@@ -16,6 +16,7 @@ import json
 from . import UtilityOps as UtilityOps
 from urllib.parse import urlparse
 from random import randint
+import csv
 import hashlib
 import requests
 from rest_framework.decorators import action
@@ -532,3 +533,29 @@ class TranscriptionDataViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin)
         headers = self.get_success_headers(serializer.data)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+def exportVerifiedCSV(request):
+	response = HttpResponse(content_type = 'text/plain')
+	writer = csv.writer(response)
+
+	writer.writerow(["Image", "Center", "Openings", "Link1", "Link2", "Link3", "Link4", "Link5", "Link6", "Confidence", "Transcription count"])
+
+	for solution in ConfidentSolution.objects.all():
+		walls = [solution.wall1, solution.wall2, solution.wall3, solution.wall4, solution.wall5, solution.wall6]
+		openings = ",".join(str(i+1) for i in range(6) if walls[i])
+
+		writer.writerow([
+			solution.puzzlePiece.url,
+			solution.center,
+			openings,
+			solution.link1,
+			solution.link2,
+			solution.link3,
+			solution.link4,
+			solution.link5,
+			solution.link6,
+			solution.confidence,
+			solution.puzzlePiece.transCount
+		])
+
+	return response
