@@ -493,6 +493,7 @@ def setOrUpdateConfidenceSolution(puzzlepieceId, confidence, transcriptiondataId
 	solution.link5 = transcription.link5
 	solution.link6 = transcription.link6
 
+	solution.datahash = transcription.datahash
 	solution.puzzlePiece = get_object_or_404(PuzzlePiece, pk=puzzlepieceId)
 
 	solution.confidence = confidence
@@ -594,6 +595,7 @@ def exportVerifiedCSV(request):
 		"Link5",
 		"Link6",
 		"Confidence",
+		"Transcription hash",
 		"Transcription count",
 		"Incorrect Rotation Flag"
 	])
@@ -618,6 +620,7 @@ def exportVerifiedCSV(request):
 			solution.link5,
 			solution.link6,
 			solution.confidence,
+			solution.datahash,
 			solution.puzzlePiece.transCount,
 			solution.rotated
 		])
@@ -668,7 +671,8 @@ def exportTranscriptionsCSV(request):
 		"Link3",
 		"Link4",
 		"Link5",
-		"Link6"
+		"Link6",
+		"Transcription hash"
 	])
 
 	for trans in TranscriptionData.objects.all():
@@ -688,7 +692,8 @@ def exportTranscriptionsCSV(request):
 			trans.link3,
 			trans.link4,
 			trans.link5,
-			trans.link6
+			trans.link6,
+			trans.datahash
 		])
 
 	return response
