@@ -49,38 +49,38 @@ def secretly_hash_my_data(data):
 	return hex_dig
 
 def findImage(url):
-	host = urlparse(url).hostname
-	if host in ["imgur.com"]:
-	# Can we be clever and figure out an Imgur URL on the fly?
-		turl = "https://i.imgur.com" + urlparse(url).path + ".png"
-		res = requests.head(turl)
-		if res.status_code == 200:
-			return turl
-		turl = "https://i.imgur.com" + urlparse(url).path + ".jpg"
-		res = requests.head(turl)
-		if res.status_code == 200:
-			return turl
-		turl = "https://i.imgur.com" + urlparse(url).path + ".jpeg"
-		res = requests.head(turl)
-		if res.status_code == 200:
-			return turl
-		return None
-	elif host in ["gyazo.com"]:
-		turl = "https://i.gyazo.com" + urlparse(url).path + ".png"
-		res = requests.head(turl)
-		if res.status_code == 200:
-			return turl
-		turl = "https://i.gyazo.com" + urlparse(url).path + ".jpg"
-		res = requests.head(turl)
-		if res.status_code == 200:
-			return turl
-		turl = "https://i.gyazo.com" + urlparse(url).path + ".jpeg"
-		res = requests.head(turl)
-		if res.status_code == 200:
-			return turl
-		return None
-	else:
-		return None
+ 	host = urlparse(url).hostname
+ 	if host in ["imgur.com"]:
+ 	# Can we be clever and figure out an Imgur URL on the fly?
+ 		turl = "https://i.imgur.com" + urlparse(url).path + ".png"
+ 		res = requests.head(turl)
+ 		if res.status_code == 200:
+ 			return turl
+ 		turl = "https://i.imgur.com" + urlparse(url).path + ".jpg"
+ 		res = requests.head(turl)
+ 		if res.status_code == 200:
+ 			return turl
+ 		turl = "https://i.imgur.com" + urlparse(url).path + ".jpeg"
+ 		res = requests.head(turl)
+ 		if res.status_code == 200:
+ 			return turl
+ 		return None
+ 	elif host in ["gyazo.com"]:
+ 		turl = "https://i.gyazo.com" + urlparse(url).path + ".png"
+ 		res = requests.head(turl)
+ 		if res.status_code == 200:
+ 			return turl
+ 		turl = "https://i.gyazo.com" + urlparse(url).path + ".jpg"
+ 		res = requests.head(turl)
+ 		if res.status_code == 200:
+ 			return turl
+ 		turl = "https://i.gyazo.com" + urlparse(url).path + ".jpeg"
+ 		res = requests.head(turl)
+ 		if res.status_code == 200:
+ 			return turl
+ 		return None
+ 	else:
+ 		return None
 
 def findUnconfidentPuzzlePieces(self):
 	import random
@@ -103,14 +103,7 @@ def findUnconfidentPuzzlePieces(self):
 		if parsedUrl.path.lower().endswith(".jpg") or parsedUrl.path.lower().endswith(".png") or parsedUrl.path.lower().endswith(".jpeg"):
 			result[index].isImage = True
 		else:
-			# Can we be clever and figure out an Image URL on the fly?
-			turl = findImage(result[index].url)
-			if turl:
-				# Future - we could also update the DB with this
-				result[index].url = turl
-				result[index].isImage = True
-			else:
-				result[index].isImage = False
+			result[index].isImage = False
 		# Warn if rotateod
 		rotated = PuzzlePiece.objects.raw('SELECT id FROM collector_rotatedimage WHERE puzzlePiece_id = ' + str(result[index].id))
 		if rotated:
