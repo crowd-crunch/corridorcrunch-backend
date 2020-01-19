@@ -4,6 +4,7 @@ from django.template import loader
 from django.shortcuts import get_object_or_404, render
 from django.views import generic
 from django.db.models import Count
+from django.conf import settings
 from .models import *
 from .serializers import (
     PuzzlePieceSerializer,
@@ -18,6 +19,7 @@ from urllib.parse import urlparse
 from random import randint
 import csv
 import hashlib
+import hmac
 import requests
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -26,6 +28,17 @@ from rest_framework import mixins, status, viewsets
 def hash_my_data(url):
 	url = url.encode("utf-8")
 	hash_object = hashlib.sha256(url)
+	hex_dig = hash_object.hexdigest()
+	return hex_dig
+
+# When exporting data, we shouldn't really make hash(ip) public because it's
+# too easy to reverse. Use HMAC with SECRET_KEY as a keyed hash, to prevent
+# reversing while still being usable as a unique identifier within a single
+# exported set of data
+def secretly_hash_my_data(data):
+	key = settings.SECRET_KEY.encode("utf-8")
+	data = data.encode("utf-8")
+	hash_object = hmac.new(key, data, hashlib.sha256)
 	hex_dig = hash_object.hexdigest()
 	return hex_dig
 
@@ -538,7 +551,19 @@ def exportVerifiedCSV(request):
 	response = HttpResponse(content_type = 'text/plain')
 	writer = csv.writer(response)
 
-	writer.writerow(["Image", "Center", "Openings", "Link1", "Link2", "Link3", "Link4", "Link5", "Link6", "Confidence", "Transcription count"])
+	writer.writerow([
+		"Image",
+		"Center",
+		"Openings",
+		"Link1",
+		"Link2",
+		"Link3",
+		"Link4",
+		"Link5",
+		"Link6",
+		"Confidence",
+		"Transcription count"
+	])
 
 	for solution in ConfidentSolution.objects.all():
 		walls = [solution.wall1, solution.wall2, solution.wall3, solution.wall4, solution.wall5, solution.wall6]
@@ -556,6 +581,71 @@ def exportVerifiedCSV(request):
 			solution.link6,
 			solution.confidence,
 			solution.puzzlePiece.transCount
+		])
+
+	return response
+
+def exportPiecesCSV(request):
+	response = HttpResponse(content_type = 'text/plain')
+	writer = csv.writer(response)
+
+	writer.writerow([
+		"Image",
+		"Submitter",
+		"Submitted date",
+		"Last modified",
+		"Transcription count"
+	])
+
+	for piece in PuzzlePiece.objects.all():
+		writer.writerow([
+			piece.url,
+			secretly_hash_my_data(piece.ip_address),
+			piece.submitted_date,
+			piece.last_modified,
+			piece.transCount
+		])
+
+	return response
+
+def exportTranscriptionsCSV(request):
+	response = HttpResponse(content_type = 'text/plain')
+	writer = csv.writer(response)
+
+	writer.writerow([
+		"Image",
+		"Submitter",
+		"Submitted date",
+		"Bad image",
+		"Orientation",
+		"Center",
+		"Openings",
+		"Link1",
+		"Link2",
+		"Link3",
+		"Link4",
+		"Link5",
+		"Link6"
+	])
+
+	for trans in TranscriptionData.objects.all():
+		walls = [trans.wall1, trans.wall2, trans.wall3, trans.wall4, trans.wall5, trans.wall6]
+		openings = ",".join(str(i+1) for i in range(6) if walls[i])
+
+		writer.writerow([
+			trans.puzzlePiece.url,
+			secretly_hash_my_data(trans.ip_address),
+			trans.submitted_date,
+			trans.bad_image,
+			trans.orientation,
+			trans.center,
+			openings,
+			trans.link1,
+			trans.link2,
+			trans.link3,
+			trans.link4,
+			trans.link5,
+			trans.link6
 		])
 
 	return response
