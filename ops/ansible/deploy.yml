@@ -4,16 +4,16 @@
   vars_files:
     - "{{ playbook_dir }}/vars/{{ varsfile }}"
   environment:
-    URL: "{{ vars.URL }}"
-    TLS_EMAIL: "{{ vars.TLS_EMAIL }}"
-    IMAGE_TAG: "{{ vars.IMAGE_TAG }}"
-    IS_DEBUG: "{{ vars.IS_DEBUG }}"
-    DJANGO_SECRET_KEY: "{{ vars.DJANGO_SECRET_KEY }}"
-    SQL_USER: "{{ vars.SQL_USER }}"
-    SQL_PASSWORD: "{{ vars.SQL_PASSWORD }}"
-    SQL_PORT: "{{ vars.SQL_PORT }}"
-    SQL_PASSWORD_ROOT: "{{ vars.SQL_PASSWORD_ROOT }}"
-    TRAEFIK_AUTHSTRING: "{{ vars.TRAEFIK_AUTHSTRING }}"
+    URL: "{{ URL }}"
+    TLS_EMAIL: "{{ TLS_EMAIL }}"
+    IMAGE_TAG: "{{ IMAGE_TAG }}"
+    IS_DEBUG: "{{ IS_DEBUG }}"
+    DJANGO_SECRET_KEY: "{{ DJANGO_SECRET_KEY }}"
+    SQL_USER: "{{ SQL_USER }}"
+    SQL_PASSWORD: "{{ SQL_PASSWORD }}"
+    SQL_PORT: "{{ SQL_PORT }}"
+    SQL_PASSWORD_ROOT: "{{ SQL_PASSWORD_ROOT }}"
+    TRAEFIK_AUTHSTRING: "{{ TRAEFIK_AUTHSTRING }}"
 
   tasks:
     - name: create application directory
@@ -32,7 +32,7 @@
         validate: "docker-compose -f %s config "
 
     - name: login to docker registry
-      shell: "docker login {{ docker.registry }} --username {{ docker.user }} --password {{ docker.pass }}"
+      shell: "docker login {{ docker_registry }} --username {{ docker_user }} --password {{ docker_pass }}"
       notify:
         - docker logout
 
