@@ -33,11 +33,6 @@ jobs:
         USERNAME: corridors-of-time-transcription
       steps:
         - uses: actions/checkout@v1
-
-        - name: setup ssh agent
-          uses: webfactory/ssh-agent@v0.2.0
-          with:
-            ssh-private-key: ${{ secrets.DEV_DEPLOY_SSH_PRIVATEKEY }}
         
         - name: setup python
           uses: actions/setup-python@v1.1.1
@@ -49,16 +44,22 @@ jobs:
             python -m pip install --upgrade pip
             pip install ansible==2.9.2 requests
 
+        - name: setup ssh
+          run: |
+            echo ${{ secrets.DEV_DEPLOY_SSH_PRIVATEKEY }} > ssh_deploykey
+
         - name: run playbooks/configure
           run: |
             ansible-playbook ops/ansible/configure.yml \
               -i ${{ secrets.DEV_DEPLOY_URL }}, \
-              -u ${{ secrets.DEV_DEPLOY_USER }}
+              -u ${{ secrets.DEV_DEPLOY_USER }} \ 
+              --private-key=ssh_deploykey
 
         - name: run playbooks/deploy
           run: |
             ansible-playbook ops/ansible/configure.yml \
               -i ${{ secrets.DEV_INSTANCE_URL }}, \
               -u ${{ secrets.DEV_DEPLOY_USER }} \
+              --private-key=ssh_deploykey \
               --extra-vars=${{ secrets.ANSIBLE_ENV_DEV }} \
               --extra-vars='{"docker":{"registry": "$REGISTRY","user":"$USERNAME","pass":"${{ secrets.GITHUB_TOKEN }}"}'
