@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, render
 from django.views import generic
 from django.views.decorators.cache import cache_page
 from django.db.models import Count, F, Max
+from django.utils.decorators import method_decorator
 from django.conf import settings
 from .models import *
 from .serializers import (
@@ -181,9 +182,8 @@ def puzzlepieceSubmit(request):
 	}
 	return HttpResponse(template.render(context, request))
 
-
+@method_decorator(cache_page(15 * 60), name='dispatch')
 class PuzzlepieceIndex(generic.ListView):
-	cache_timeout = 15 * 60
 	template_name = 'collector/latest.html'
 	context_object_name = 'latest'
 
@@ -353,9 +353,8 @@ def processTransscriptionData(rawData, bad_image, rotated_image, puzzlePiece, cl
 
 	return errors, transcriptData
 
-
+@method_decorator(cache_page(15 * 60), name='dispatch')
 class TranscriptionsIndex(generic.ListView):
-	cache_timeout = 15 * 60
 	template_name = 'collector/transcriptions.html'
 	context_object_name = 'latest'
 
@@ -376,8 +375,8 @@ def transcriptionsDetail(request, transcription_id):
 	return render(request, 'collector/transcriptionDetail.html', context)
 
 
+@method_decorator(cache_page(15 * 60), name='dispatch')
 class ConfidenceIndex(generic.ListView):
-	cache_timeout = 15 * 60
 	model = ConfidenceTracking
 	template_name = 'collector/confidenceIndex.html'
 	context_object_name = 'latest'
@@ -564,6 +563,7 @@ def setOrUpdateConfidenceSolution(puzzlepieceId, confidence, transcriptiondataId
 
 	return solution
 
+@method_decorator(cache_page(15 * 60), name='dispatch')
 class ConfidenceSolutionIndex(generic.ListView):
 	model = ConfidentSolution
 	template_name = 'collector/confidenceSolutionIndex.html'
