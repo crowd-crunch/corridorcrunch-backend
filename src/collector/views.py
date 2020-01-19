@@ -580,6 +580,7 @@ class TranscriptionDataViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin)
 @cache_page(60 * 15)
 def exportVerifiedCSV(request):
 	response = HttpResponse(content_type = 'text/csv')
+	response['Content-Disposition'] = 'attachment; filename="verified.csv"'
 	writer = csv.writer(response)
 
 	writer.writerow([
@@ -626,6 +627,7 @@ def exportVerifiedCSV(request):
 @cache_page(60 * 30)
 def exportPiecesCSV(request):
 	response = HttpResponse(content_type = 'text/csv')
+	response['Content-Disposition'] = 'attachment; filename="imgurls.csv"'
 	writer = csv.writer(response)
 
 	writer.writerow([
@@ -650,6 +652,7 @@ def exportPiecesCSV(request):
 @cache_page(60 * 15)
 def exportTranscriptionsCSV(request):
 	response = HttpResponse(content_type = 'text/csv')
+	response['Content-Disposition'] = 'attachment; filename="transcriptions.csv"'
 	writer = csv.writer(response)
 
 	writer.writerow([
