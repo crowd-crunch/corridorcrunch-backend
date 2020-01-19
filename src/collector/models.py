@@ -28,6 +28,11 @@ class PuzzlePiece(models.Model):
 
 
 class TranscriptionData(models.Model):
+	class Meta:
+		indexes = [
+			models.Index(fields=['ip_address'], name='ip_address_idx')
+		]
+	
 	puzzlePiece = models.ForeignKey(PuzzlePiece, on_delete=models.CASCADE, related_name="transcriptions")
 	ip_address = models.CharField(max_length=64, default="?.?.?.?", verbose_name="hash of submitter ip address")
 	submitted_date = models.DateTimeField(verbose_name="submitted date", auto_now=True)
