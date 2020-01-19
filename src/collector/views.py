@@ -49,38 +49,38 @@ def secretly_hash_my_data(data):
 	return hex_dig
 
 def findImage(url):
- 	host = urlparse(url).hostname
- 	if host in ["imgur.com"]:
- 	# Can we be clever and figure out an Imgur URL on the fly?
- 		turl = "https://i.imgur.com" + urlparse(url).path + ".png"
- 		res = requests.head(turl)
- 		if res.status_code == 200:
- 			return turl
- 		turl = "https://i.imgur.com" + urlparse(url).path + ".jpg"
- 		res = requests.head(turl)
- 		if res.status_code == 200:
- 			return turl
- 		turl = "https://i.imgur.com" + urlparse(url).path + ".jpeg"
- 		res = requests.head(turl)
- 		if res.status_code == 200:
- 			return turl
- 		return None
- 	elif host in ["gyazo.com"]:
- 		turl = "https://i.gyazo.com" + urlparse(url).path + ".png"
- 		res = requests.head(turl)
- 		if res.status_code == 200:
- 			return turl
- 		turl = "https://i.gyazo.com" + urlparse(url).path + ".jpg"
- 		res = requests.head(turl)
- 		if res.status_code == 200:
- 			return turl
- 		turl = "https://i.gyazo.com" + urlparse(url).path + ".jpeg"
- 		res = requests.head(turl)
- 		if res.status_code == 200:
- 			return turl
- 		return None
- 	else:
- 		return None
+	host = urlparse(url).hostname
+	if host in ["imgur.com"]:
+	# Can we be clever and figure out an Imgur URL on the fly?
+		turl = "https://i.imgur.com" + urlparse(url).path + ".png"
+		res = requests.head(turl)
+		if res.status_code == 200:
+			return turl
+		turl = "https://i.imgur.com" + urlparse(url).path + ".jpg"
+		res = requests.head(turl)
+		if res.status_code == 200:
+			return turl
+		turl = "https://i.imgur.com" + urlparse(url).path + ".jpeg"
+		res = requests.head(turl)
+		if res.status_code == 200:
+			return turl
+		return None
+	elif host in ["gyazo.com"]:
+		turl = "https://i.gyazo.com" + urlparse(url).path + ".png"
+		res = requests.head(turl)
+		if res.status_code == 200:
+			return turl
+		turl = "https://i.gyazo.com" + urlparse(url).path + ".jpg"
+		res = requests.head(turl)
+		if res.status_code == 200:
+			return turl
+		turl = "https://i.gyazo.com" + urlparse(url).path + ".jpeg"
+		res = requests.head(turl)
+		if res.status_code == 200:
+			return turl
+		return None
+	else:
+		return None
 
 def findUnconfidentPuzzlePieces(self):
 	import random
