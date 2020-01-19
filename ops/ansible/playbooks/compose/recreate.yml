@@ -2,7 +2,7 @@
 - hosts: all
   become: true
   vars_files:
-    - "{{ playbook_dir }}/vars/{{ varsfile }}"
+    - "{{ playbook_dir }}/../../vars/{{ varsfile }}"
   environment:
     URL: "{{ URL }}"
     TLS_EMAIL: "{{ TLS_EMAIL }}"
@@ -24,7 +24,7 @@
 
     - name: place composefile
       copy:
-        src: "{{ playbook_dir }}/files/compose/docker-compose.yml"
+        src: "{{ playbook_dir }}/../../files/compose/docker-compose.yml"
         dest: "/puzzlepieces/docker-compose.yml"
         owner: root
         group: root

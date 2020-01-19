@@ -2,7 +2,7 @@
 - hosts: all
   become: false
   vars_files:
-    - "{{ playbook_dir }}/vars/{{ varsfile }}"
+    - "{{ playbook_dir }}/../../vars/{{ varsfile }}"
   vars:
     projectdir: /home/ubuntu/puzzlepieces
     machineuser: ubuntu
@@ -26,7 +26,7 @@
 
     - name: place and validate backend configuration
       copy:
-        src: "{{ playbook_dir }}/files/stack/backend.yml"
+        src: "{{ playbook_dir }}/../../files/stack/backend.yml"
         dest: "{{ projectdir }}/backend.yml"
         owner: {{ machineuser }}
         group: {{ machineuser }}
@@ -35,7 +35,7 @@
 
     - name: place and validate proxy configuration
       copy:
-        src: "{{ playbook_dir }}/files/stack/proxy.yml"
+        src: "{{ playbook_dir }}/../../files/stack/proxy.yml"
         dest: "{{ projectdir }}/proxy.yml"
         owner: {{ machineuser }}
         group: {{ machineuser }}
