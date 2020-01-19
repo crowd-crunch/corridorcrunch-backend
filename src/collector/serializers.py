@@ -12,9 +12,27 @@ class TranscriptionDataSerializer(serializers.ModelSerializer):
 
 
 class PuzzlePieceSerializer(serializers.ModelSerializer):
+    badimages = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = models.PuzzlePiece
-        fields = ['id', 'url', 'approved', 'confidences', 'confidentsolutions', 'badimages', 'rotatedimages', 'transCount']
+        fields = [
+            'id', 'url', 'approved',
+            'confidences', 'confidentsolutions',
+            'badimages', 'rotatedimages',
+            'transCount'
+        ]
+
+    def get_badimages(self, piece):
+        # check if queryset was annotated
+        if hasattr(piece, 'badimage_count'):
+            return piece.badimage_count
+
+        # queryset wasn't annotated, do the slow thing
+        if piece.badimages.count() > 0:
+            return piece.badimages.first().badCount
+
+        return 0
 
 
 class BadImageSerializer(serializers.ModelSerializer):

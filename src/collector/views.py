@@ -4,7 +4,7 @@ from django.template import loader
 from django.shortcuts import get_object_or_404, render
 from django.views import generic
 from django.views.decorators.cache import cache_page
-from django.db.models import Count
+from django.db.models import Count, F, Max
 from django.conf import settings
 from .models import *
 from .serializers import (
@@ -508,7 +508,10 @@ def confidenceSolutionDetail(request, solution_id):
 
 
 class PuzzlePieceViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = PuzzlePiece.objects.all()
+    # annotate badimages count for serializer performance
+    queryset = PuzzlePiece.objects.all().annotate(
+        badimage_count=Max('badimages__badCount'),
+    )
     serializer_class = PuzzlePieceSerializer
 
     @action(detail=False)
@@ -523,6 +526,22 @@ class PuzzlePieceViewSet(viewsets.ReadOnlyModelViewSet):
         random_index = randint(0, count - 1)
         rando = qs[random_index]
         serializer = self.get_serializer(rando)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def report(self, request, *args, **kwargs):
+        piece = self.get_object()
+        if piece.badimages.count() > 0:
+            # atomic increment of the count on all existing BadImages
+            piece.badimages.update(badCount=F('badCount')+1)
+        else:
+            # create a BadImage... might have a race condition :(
+            bad = BadImage(puzzlePiece=piece, badCount=1)
+            bad.save()
+
+        # go ahead and return the updated piece
+        piece = self.get_object()
+        serializer = self.get_serializer(piece)
         return Response(serializer.data)
 
 
