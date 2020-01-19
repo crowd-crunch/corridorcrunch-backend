@@ -55,6 +55,10 @@ def findImage(url):
 		res = requests.head(turl)
 		if res.status_code == 200:
 			return turl
+		turl = "https://i.imgur.com" + urlparse(url).path + ".jpeg"
+		res = requests.head(turl)
+		if res.status_code == 200:
+			return turl
 		return None
 	else:
 		return None
