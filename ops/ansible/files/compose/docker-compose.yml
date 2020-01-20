@@ -30,8 +30,8 @@ services:
     image: jwilder/nginx-proxy
     environment:
       - DHPARAM_GENERATION=0
-    ports:
-      - "80:80"
+    expose:
+      - 80
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
     labels:
@@ -67,7 +67,7 @@ services:
       - VIRTUAL_PORT=8000
       - VIRTUAL_PROTO=uwsgi
     labels:
-      -  "traefik.enable=true"
+      -  "traefik.enable=false"
 
     depends_on:
       - db
