@@ -116,12 +116,12 @@ def findUnconfidentPuzzlePieces(self):
 	return None
 
 
-@cache_page(60 * 15)
+@cache_page(60 * 60)
 def index(request):
 	template = loader.get_template("collector/index.html")
 	return HttpResponse(template.render(None, request))
 
-@cache_page(60 * 15)
+@cache_page(60 * 60)
 def transcriptionGuide(request):
 	template = loader.get_template("collector/transcriptionGuide.html")
 	return HttpResponse(template.render(None, request))
@@ -177,7 +177,7 @@ def puzzlepieceSubmit(request):
 	}
 	return HttpResponse(template.render(context, request))
 
-@method_decorator(cache_page(15 * 60), name='dispatch')
+@method_decorator(cache_page(5 * 60), name='dispatch')
 class PuzzlepieceIndex(generic.ListView):
 	template_name = 'collector/latest.html'
 	context_object_name = 'latest'
@@ -348,7 +348,7 @@ def processTransscriptionData(rawData, bad_image, rotated_image, puzzlePiece, cl
 
 	return errors, transcriptData
 
-@method_decorator(cache_page(15 * 60), name='dispatch')
+@method_decorator(cache_page(5 * 60), name='dispatch')
 class TranscriptionsIndex(generic.ListView):
 	template_name = 'collector/transcriptions.html'
 	context_object_name = 'latest'
@@ -370,7 +370,7 @@ def transcriptionsDetail(request, transcription_id):
 	return render(request, 'collector/transcriptionDetail.html', context)
 
 
-@method_decorator(cache_page(15 * 60), name='dispatch')
+@method_decorator(cache_page(5 * 60), name='dispatch')
 class ConfidenceIndex(generic.ListView):
 	model = ConfidenceTracking
 	template_name = 'collector/confidenceIndex.html'
@@ -558,7 +558,7 @@ def setOrUpdateConfidenceSolution(puzzlepieceId, confidence, transcriptiondataId
 
 	return solution
 
-@method_decorator(cache_page(15 * 60), name='dispatch')
+@method_decorator(cache_page(5 * 60), name='dispatch')
 class ConfidenceSolutionIndex(generic.ListView):
 	model = ConfidentSolution
 	template_name = 'collector/confidenceSolutionIndex.html'
@@ -636,7 +636,7 @@ class TranscriptionDataViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-@cache_page(60 * 15)
+@cache_page(60 * 5)
 def exportVerifiedCSV(request):
 	response = HttpResponse(content_type = 'text/csv')
 	response['Content-Disposition'] = 'attachment; filename="verified.csv"'
@@ -685,7 +685,7 @@ def exportVerifiedCSV(request):
 
 	return response
 
-@cache_page(60 * 30)
+@cache_page(60 * 10)
 def exportPiecesCSV(request):
 	response = HttpResponse(content_type = 'text/csv')
 	response['Content-Disposition'] = 'attachment; filename="imgurls.csv"'
@@ -710,7 +710,7 @@ def exportPiecesCSV(request):
 
 	return response
 
-@cache_page(60 * 15)
+@cache_page(60 * 5)
 def exportTranscriptionsCSV(request):
 	response = HttpResponse(content_type = 'text/csv')
 	response['Content-Disposition'] = 'attachment; filename="transcriptions.csv"'
