@@ -9,9 +9,15 @@ join us on discord!
 
 # And we're done
 It's been a blast, thank you to everyone who transcribed, you're the true GOATs!  
-Final csv export files are in this repo  
-We had over 26,000 image URLs submitted, almost 51,000 transcriptions, of which almost 29,000 were used to find trusted transcriptions, and found over 1,400 trusted transcriptions.  
-If there is one regret, it is that we did not catch an important bug in our frontend API earlier, which means all transcriptions submitted through the "pretty" front-end never were used to find "solutions". We could and would have fixed that in a couple more hours, and then the puzzle got solved.  
+Final csv export files are in this repo, in both rehashed and original format   
+
+ - We collected a total of 50885 transcriptions in just hours / days
+ - We got confident on 1453 puzzlepieces, 1096 of them being unique
+ - Our database on puzzlepieces to transcribe contains a total 26336 images
+ - The person with the most transcriptions transcribed 184 images
+ - Every person has transcribed an average count of 10.1543 images
+
+We're looking forward to the next community based puzzle - next time we'll kick that off even earlier
 
 You all ROCK!
  
