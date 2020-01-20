@@ -25,10 +25,32 @@ services:
     volumes:
       - "proxy_letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  nginx-proxy:
+    container_name: puzzlepieces_proxy
+    image: jwilder/nginx-proxy
+    environment:
+      - DHPARAM_GENERATION=0
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`${URL}`)"
+      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend-http.entrypoints=web"
+      - "traefik.http.routers.backend-http.rule=Host(`${URL}`)"
+      - "traefik.http.middlewares.backend-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.backend-http.middlewares=backend-https@docker"
+    depends_on:
+      - backend
+
   backend:
     image: docker.pkg.github.com/corridors-of-time-transcription/puzzlepieces/puzzlepieces:${IMAGE_TAG}
     restart: always
-    command: python manage.py runserver 0.0.0.0:8000
+    command: uwsgi --ini /usr/src/app/uwsgi.ini
     expose:
       - 8000
     environment:
@@ -42,17 +64,15 @@ services:
       - SQL_HOST=db
       - SQL_PORT=${SQL_PORT}
       - DATABASE=mysql
+      - VIRTUAL_HOST=${URL}
+      - VIRTUAL_PORT=8000
+      - VIRTUAL_PROTO=uwsgi
+    labels:
+      -  "traefik.enable=true"
+
     depends_on:
       - db
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`${URL}`)"
-      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.backend.entrypoints=websecure"
-      - "traefik.http.routers.backend-http.entrypoints=web"
-      - "traefik.http.routers.backend-http.rule=Host(`${URL}`)"
-      - "traefik.http.middlewares.backend-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.backend-http.middlewares=backend-https@docker"
+
   db:
     restart: always
     image: mysql:5.7
