@@ -2,6 +2,10 @@ name: Build Docker Image
 
 on:
   pull_request:
+    paths-ignore:
+      - 'ops/**'
+      - 'scripts/**'
+      - '.github/**'
     branches:
       - develop
       - master
