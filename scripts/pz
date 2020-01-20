@@ -3,66 +3,81 @@ setupenv() {
     cp ops/db-dev.env.example ops/db-dev.env
     cp ops/development.env.example ops/development.env
 }
-build() {
-    docker-compose -f ops/docker-compose.dev.yml build
+cmd() {
+    docker-compose -f "${CFILE}" $@
 }
-inplace() {
-    docker-compose -f ops/docker-compose.dev.yml build
-    docker-compose -f ops/docker-compose.dev.yml up -d
+build() {
+    cmd build $@
 }
 up() {
-    docker-compose -f ops/docker-compose.dev.yml up -d
+    cmd up -d $@
 }
 down() {
-    docker-compose -f ops/docker-compose.dev.yml down
+    cmd down $@
+}
+inplace() {
+    cmd build $@
+    cmd up $@
 }
 restart() {
-    docker-compose -f ops/docker-compose.dev.yml down
-    docker-compose -f ops/docker-compose.dev.yml up -d
+    cmd down $@
+    cmd up $@
 }
 logs() {
-    docker-compose -f ops/docker-compose.dev.yml logs
-}
-logsf() {
-    docker-compose -f ops/docker-compose.dev.yml logs -f
+    cmd logs $@
 }
 exec() {
-    docker-compose -f ops/docker-compose.dev.yml exec $@
-}
-cmd() {
-    docker-compose -f ops/docker-compose.dev.yml $@
+    cmd exec $@
 }
 
-# LOCAL
-lbuild() {
-    docker-compose -f ops/docker-compose.dev.yml build
-}
-linplace() {
-    docker-compose -f ops/docker-compose.dev.local.yml build
-    docker-compose -f ops/docker-compose.dev.local.yml up -d
-}
-lup() {
-    docker-compose -f ops/docker-compose.dev.local.yml up -d
-}
-ldown() {
-    docker-compose -f ops/docker-compose.dev.local.yml down
-}
-lrestart() {
-    docker-compose -f ops/docker-compose.dev.local.yml down
-    docker-compose -f ops/docker-compose.dev.local.yml up -d
-}
-llogs() {
-    docker-compose -f ops/docker-compose.dev.local.yml logs
-}
-llogsf() {
-    docker-compose -f ops/docker-compose.dev.local.yml logs -f
-}
-lexec() {
-    docker-compose -f ops/docker-compose.dev.local.yml exec $@
-}
-lcmd() {
-    docker-compose -f ops/docker-compose.dev.local.yml $@
-}
+if [[ "$1" == "help" || "$1" == "-h" || "$1" == "--help" ]]; then
+    echo "usage: pz [l|help|-h|--help] <subcommand>"
+    echo ""
+    echo "optional arguments:"
+    echo "  help | -h | --help"
+    echo "    print this message and exits"
+    echo "  l"
+    echo "    mounts the src/ directory into the container instead of copying the code into the container"
+    echo ""
+    echo "subcommands:"
+    echo "  setupenv"
+    echo "     setup development environment files, DO NOT USE FOR PROD"
+    echo "  build "
+    echo "     builds all containers with a build: directive"
+    echo "  up"
+    echo "     starts the stack creating the containers if they don't exist already, only replacing containers whose configurations have changed"
+    echo "  down"
+    echo "     stops the stack, removing the containers (but not deleting data stored in local mounts or named volumes"
+    echo "  restart"
+    echo "     restarts the containers without tearing down or creating"
+    echo "  inplace"
+    echo "     runs build and then up, rebuilding containers"
+    echo "  logs"
+    echo "     shows logs"
+    echo "  exec <container> <command> <optional_args>"
+    echo "     executes arbitrary command in specified container."
+    echo "  cmd <command>"
+    echo "     executes arbitrary docker-compose command. use "help" help to list them"
+    echo ""
+    echo ""
+    echo "all subcommands except setupenv and cmd can be appended by flags and specifying the container/s. examples: "
+    echo ""
+    echo "  pz logs -f web"
+    echo "    runs command only on web service"
+    echo ""
+    echo "  pz restart proxy backend"
+    echo "    restarts only backend and proxy services"
+    exit 0
+fi
+
+CFILE="ops/docker-compose.dev.yml"
+
+if [[ "$1" == "l" ]]; then
+    CFILE="ops/docker-compose.dev.local.yml"
+    shift
+fi
+
 command=${1}
 shift
+
 ${command} $@

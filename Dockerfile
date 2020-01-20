@@ -10,9 +10,14 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # install psycopg2 dependencies
-RUN apt-get update
-RUN apt-cache search mariadb
-RUN apt-get install -y libmariadb-dev mariadb-client gcc python3-dev musl-dev default-mysql-client
+RUN apt-get update && apt-get install -y \
+    libmariadb-dev \
+    mariadb-client \
+    gcc \
+    python3-dev \
+    musl-dev \
+    default-mysql-client \
+  && rm -rf /var/lib/apt/lists/*
 
 # copy project
 COPY src/ /usr/src/app/
@@ -20,10 +25,6 @@ COPY src/ /usr/src/app/
 # install dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-
-
-#RUN addgroup -S app && adduser -S app -G app
-#USER app
 
 # run entrypoint.sh
 ENTRYPOINT ["/usr/src/app/entrypoint.sh"]

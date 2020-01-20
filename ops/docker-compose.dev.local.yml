@@ -11,11 +11,14 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock:ro
     environment:
       - DHPARAM_GENERATION=0
+      - VIRTUAL_HOST=puzzlepieces_backend
+      - VIRTUAL_PORT=8000
+      - VIRTUAL_PROTO=uwsgi
   web:
     container_name: puzzlepieces_backend
     image: puzzlepieces_backend
     build: ../
-    command: python manage.py runserver 0.0.0.0:8000
+    command: uwsgi --ini /usr/src/app/uwsgi.ini
     expose:
      - 8000
     environment:
