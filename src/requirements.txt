@@ -2,3 +2,4 @@ Django
 mysqlclient
 requests
 djangorestframework
+uwsgi
