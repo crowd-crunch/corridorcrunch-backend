@@ -20,7 +20,8 @@ Final csv export files are in this repo, in both rehashed and original format
 We're looking forward to the next community based puzzle - next time we'll kick that off even earlier
 
 You all ROCK!
- 
+
+[The repo for the pretty pretty frontend](https://github.com/Corridors-of-Time-Transcription/corridorcrunch-frontend)
 # about
 > spreadsheetstiny 2: corridors of sleeplessness
 
