@@ -27,7 +27,8 @@ TEMPLATE_DIRS = (
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(os.environ.get("DEBUG", default=0))
+DEBUG = False
+#DEBUG = int(os.environ.get("DEBUG", default=0))
 
 #DJANGO_ALLOWED_HOSTS
 #ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
@@ -88,7 +89,6 @@ DATABASES = {
         "PASSWORD": os.environ.get("SQL_PASSWORD", "puzzling"),
         "HOST": os.environ.get("SQL_HOST", "localhost"),
         "PORT": os.environ.get("SQL_PORT", "5432"),
-        "CONN_MAX_AGE": 60,
         "OPTIONS": {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
